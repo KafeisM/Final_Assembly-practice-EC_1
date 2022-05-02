@@ -1,0 +1,202 @@
+00001062 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 02/05/2022 18:09:21
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : PRAFIN22
+00000000                             3  * Written by : Jordi Florit Ensenyat y Marc Ferrer Fernández
+00000000                             4  * Date       : 30/05/2022
+00000000                             5  * Description: Emulador de la JARVIS
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG $1000
+00001000= 2800 2A03 50E0 0...        8  EMEM:   DC.W $2800,$2A03,$50E0,$0B60,$5114,$0C70,$1430,$0E40,$7140,$3001,$32FF,$90D0
+00001018= 8020 C000 0002 0...        9          DC.W $8020,$C000,$0002,$0003,$0001,$0003,$0002,$0004,$0000,$0000,$0000
+0000102E= 0000                      10  EIR:    DC.W 0 ;eregistro de instruccion
+00001030= 0000                      11  EPC:    DC.W 0 ;econtador de programa
+00001032= 0000                      12  EB0:    DC.W 0 ;eregistro B0
+00001034= 0000                      13  EB1:    DC.W 0 ;eregistro B1
+00001036= 0000                      14  ER2:    DC.W 0 ;eregistro R2
+00001038= 0000                      15  ER3:    DC.W 0 ;eregistro R3
+0000103A= 0000                      16  ER4:    DC.W 0 ;eregistro R4
+0000103C= 0000                      17  ER5:    DC.W 0 ;eregistro R5
+0000103E= 0000                      18  ET6:    DC.W 0 ;eregistro T6
+00001040= 0000                      19  ET7:    DC.W 0 ;eregistro T7
+00001042= 0000                      20  ESR:    DC.W 0 ;eregistro de estado (00000000 00000ZCN)
+00001044                            21  
+00001044                            22  CODE:   DS.W 14 ;vector temporaneo que guarda el codigo de la instrucción
+00001060                            23  AUX:    DS.W 1
+00001062                            24  
+00001062                            25  START:
+00001062  4278 1030                 26      CLR.W EPC
+00001066                            27  
+00001066                            28  FETCH:
+00001066                            29      ;--- IFETCH: INICIO FETCH
+00001066                            30          ;*** En esta seccion debeis introducir el codigo necesario para cargar
+00001066                            31          ;*** en el EIR la siguiente instruccion a ejecutar, indicada por el EPC,
+00001066                            32          ;*** y dejar listo el EPC para que apunte a la siguiente instruccion
+00001066                            33      
+00001066                            34          ;temporal
+00001066  303C 000E                 35          MOVE.W #14,D0
+0000106A  5340                      36          SUBQ.W #1,D0
+0000106C                            37          
+0000106C  41F8 1000                 38          LEA EMEM,A0
+00001070  31FC 0000 1060            39          MOVE.W #0,AUX
+00001076                            40          
+00001076  43F8 1044                 41          LEA CODE,A1
+0000107A                            42          
+0000107A                            43  LOOP1:      
+0000107A  3428 1060                 44          MOVE.W AUX(A0),D2
+0000107E                            45          
+0000107E  4EB9 00001088             46          JSR DECOD_
+00001084  51C8 FFF4                 47          DBRA D0,LOOP1
+00001088                            48          
+00001088                            49      ;--- FFETCH: FIN FETCH
+00001088                            50      
+00001088                            51      
+00001088                            52      ;--- IBRDECOD: INICIO SALTO A DECOD
+00001088                            53          ;*** En esta seccion debeis preparar la pila para llamar a la subrutina
+00001088                            54          ;*** DECOD, llamar a la subrutina, y vaciar la pila correctamente,
+00001088                            55          ;*** almacenando el resultado de la decodificacion en D1
+00001088                            56  DECOD_:
+00001088                            57         
+00001088  0802 000F                 58         BTST.L #15,D2
+0000108C  6700 0002                 59         BEQ BIT15_1
+00001090                            60  
+00001090                            61  
+00001090                            62  BIT15_1:
+00001090  0802 000E                 63         BTST.L #14,D2
+00001094  6700 001C                 64         BEQ BIT14_1
+00001098                            65         
+00001098  0802 000D                 66         BTST.L #13,D2
+0000109C  6700 0014                 67         BEQ BIT13_1
+000010A0                            68         
+000010A0  0802 000C                 69         BTST.L #12,D2
+000010A4  6700 000C                 70         BEQ BIT12_1
+000010A8  32FC 000A                 71         MOVE.W #10,(A1)+ ;instrucción num BRI M
+000010AC  4EF9 000010B6             72         JMP END_DEC
+000010B2                            73         
+000010B2                            74      
+000010B2                            75  BIT14_1:
+000010B2                            76                                       
+000010B2                            77  BIT13_1:
+000010B2                            78  
+000010B2                            79  BIT12_1:
+000010B2                            80        
+000010B2  32FC 000B                 81        MOVE.W #11, (A1)+ ;instruccion num BRZ M
+000010B6                            82  
+000010B6                            83  END_DEC:
+000010B6  4E75                      84          RTS 
+000010B8                            85          
+000010B8                            86      ;--- FBRDECOD: FIN SALTO A DECOD
+000010B8                            87      
+000010B8                            88      
+000010B8                            89      ;--- IBREXEC: INICIO SALTO A FASE DE EJECUCION
+000010B8                            90          ;*** Esta seccion se usa para saltar a la fase de ejecucion
+000010B8                            91          ;*** NO HACE FALTA MODIFICARLA
+000010B8  C2FC 0006                 92      MULU #6,D1
+000010BC  2241                      93      MOVEA.L D1,A1
+000010BE  4EE9 10C2                 94      JMP JMPLIST(A1)
+000010C2                            95  JMPLIST:
+000010C2  4EF9 00001116             96      JMP ETRA
+000010C8  4EF9 00001116             97      JMP EADD
+000010CE  4EF9 00001116             98      JMP ESUB
+000010D4  4EF9 00001116             99      JMP ENAN
+000010DA  4EF9 00001116            100      JMP ESTC
+000010E0  4EF9 00001116            101      JMP EINC
+000010E6  4EF9 00001116            102      JMP ELOA
+000010EC  4EF9 00001116            103      JMP ELOAX
+000010F2  4EF9 00001116            104      JMP ESTO
+000010F8  4EF9 00001116            105      JMP ESTOX
+000010FE  4EF9 00001116            106      JMP EBRI
+00001104  4EF9 00001116            107      JMP EBRZ
+0000110A  4EF9 00001116            108      JMP EBRN
+00001110  4EF9 00001116            109      JMP ESTP
+00001116                           110      ;--- FBREXEC: FIN SALTO A FASE DE EJECUCION
+00001116                           111      
+00001116                           112      
+00001116                           113      ;--- IEXEC: INICIO EJECUCION
+00001116                           114          ;*** En esta seccion debeis implementar la ejecucion de cada einstr.
+00001116                           115      
+00001116                           116      ; ESCRIBID EN CADA ETIQUETA LA FASE DE EJECUCION DE CADA INSTRUCCION
+00001116                           117  ETRA:
+00001116                           118  EADD:
+00001116                           119  ESUB:
+00001116                           120  ENAN:
+00001116                           121  ESTC:
+00001116                           122  EINC:
+00001116                           123  ELOA:
+00001116                           124  ELOAX:
+00001116                           125  ESTO:
+00001116                           126  ESTOX:
+00001116                           127  EBRI:
+00001116                           128  EBRZ:
+00001116                           129  EBRN:
+00001116                           130  ESTP:
+00001116                           131      ;--- FEXEC: FIN EJECUCION
+00001116                           132      
+00001116                           133  
+00001116                           134      ;--- ISUBR: INICIO SUBRUTINAS
+00001116                           135          ;*** Aqui debeis incluir las subrutinas que necesite vuestra solucion
+00001116                           136          ;*** SALVO DECOD, que va en la siguiente seccion
+00001116                           137  
+00001116                           138          ; ESCRIBID VUESTRO CODIGO AQUI
+00001116                           139          
+00001116                           140      ;--- FSUBR: FIN SUBRUTINAS
+00001116                           141      
+00001116                           142  
+00001116                           143      ;--- IDECOD: INICIO DECOD
+00001116                           144          ;*** Tras la etiqueta DECOD, debeis implementar la subrutina de 
+00001116                           145          ;*** decodificacion, que debera ser de libreria, siguiendo la interfaz
+00001116                           146          ;*** especificada en el enunciado
+00001116                           147  DECOD:
+00001116                           148          ; ESCRIBID VUESTRO CODIGO AQUI
+00001116                           149  
+00001116                           150      ;--- FDECOD: FIN DECOD
+00001116                           151      END    START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+AUX                 1060
+BIT12_1             10B2
+BIT13_1             10B2
+BIT14_1             10B2
+BIT15_1             1090
+CODE                1044
+DECOD               1116
+DECOD_              1088
+EADD                1116
+EB0                 1032
+EB1                 1034
+EBRI                1116
+EBRN                1116
+EBRZ                1116
+EINC                1116
+EIR                 102E
+ELOA                1116
+ELOAX               1116
+EMEM                1000
+ENAN                1116
+END_DEC             10B6
+EPC                 1030
+ER2                 1036
+ER3                 1038
+ER4                 103A
+ER5                 103C
+ESR                 1042
+ESTC                1116
+ESTO                1116
+ESTOX               1116
+ESTP                1116
+ESUB                1116
+ET6                 103E
+ET7                 1040
+ETRA                1116
+FETCH               1066
+JMPLIST             10C2
+LOOP1               107A
+START               1062

@@ -43,7 +43,7 @@ FETCH:
 LOOP1:	    
 	    MOVE.W AUX(A0),D2
 	    
-	    JSR DECOD
+	    JSR DECOD_
 	    DBRA D0,LOOP1
         
     ;--- FFETCH: FIN FETCH
@@ -68,7 +68,7 @@ BIT15_1:
        
        BTST.L #12,D2
        BEQ BIT12_1
-       MOVE.W #10,(A1)+ ;instrucción num 10
+       MOVE.W #10,(A1)+ ;instrucción num BRI M
        JMP END_DEC
        
     
@@ -76,13 +76,13 @@ BIT14_1:
                                      
 BIT13_1:
 
-BIT12_1
+BIT12_1:
+      
+      MOVE.W #11, (A1)+ ;instruccion num BRZ M
 
-
-END_DEC
+END_DEC:
         RTS 
     	
-        
     ;--- FBRDECOD: FIN SALTO A DECOD
     
     
@@ -149,6 +149,8 @@ DECOD:
 
     ;--- FDECOD: FIN DECOD
     END    START
+
+
 
 
 *~Font name~Courier New~
