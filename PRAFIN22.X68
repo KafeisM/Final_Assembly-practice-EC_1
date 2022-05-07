@@ -20,7 +20,6 @@ ET7:    DC.W 0 ;eregistro T7
 ESR:    DC.W 0 ;eregistro de estado (00000000 00000ZCN)
 
 CODE:   DS.W 14 ;vector temporaneo que guarda el codigo de la instrucción
-AUX:    DS.W 1
 
 START:
     CLR.W EPC
@@ -32,19 +31,21 @@ FETCH:
 	    ;*** y dejar listo el EPC para que apunte a la siguiente instruccion
 	
 	    ;temporal
-	    MOVE.W #14,D0
+	    MOVE.W #14,D0   ;bucle de 14 iteraciones
 	    SUBQ.W #1,D0
 	    
-	    LEA EMEM,A0
-	    MOVE.W #0,AUX
+	    LEA EMEM,A0     ;operamos sobre el vector EMEM
 	    
 	    LEA CODE,A1
 	    
 LOOP1:	    
-	    MOVE.W AUX(A0),D2
+	    MOVE.W (A0)+,D2
 	    
-	    JSR DECOD_
+	    JMP DECOD_      ;salto(temporal decodificacion)
+RETURN:	
 	    DBRA D0,LOOP1
+	    
+	    SIMHALT ;fin temporal
         
     ;--- FFETCH: FIN FETCH
     
@@ -56,32 +57,76 @@ LOOP1:
 DECOD_:
        
        BTST.L #15,D2
-       BEQ BIT15_1
-
-
-BIT15_1:
-       BTST.L #14,D2
-       BEQ BIT14_1
+       BNE BIT15_1   
        
+;Inicio rama 0x
+       BTST.L #14,D2
+       BNE R0BIT14_1
+       
+      ;si bit 14 = continuar rama aqui
+      
+      
+      
+
+R0BIT14_1:
        BTST.L #13,D2
-       BEQ BIT13_1
+       BNE R0BIT13_1
        
        BTST.L #12,D2
-       BEQ BIT12_1
+       BNE R0_1_BIT12_1
+       
+       MOVE.W #6,(A1)+  ;instrucción num LOA M
+       JMP END_DEC
+       
+R0BIT13_1:
+       BTST.L #12,D2
+       BNE R0_2_BIT12_1
+       MOVE.W #8,(A1)+   ;instrucción num STOM
+       JMP END_DEC
+
+R0_1_BIT12_1:
+       MOVE.W #7,(A1)+ ;instrucción num LOAX 
+       JMP END_DEC
+       
+R0_2_BIT12_1:
+       MOVE.W #9,(A1)+ ;instrucción num STOX
+       JMP END_DEC
+       
+  
+
+
+     
+;Inicio rama 1x 
+BIT15_1:
+       BTST.L #14,D2
+       BNE R1BIT14_1
+       
+       BTST.L #13,D2
+       BNE R1BIT13_1
+       
+       BTST.L #12,D2
+       BNE R1BIT12_1
+       
        MOVE.W #10,(A1)+ ;instrucción num BRI M
        JMP END_DEC
        
     
-BIT14_1:
+R1BIT14_1:
+       MOVE.W #13,(A1)+ ;instrucción num STP
+       JMP END_DEC
                                      
-BIT13_1:
+R1BIT13_1:
+       MOVE.W #12,(A1)+ ;instrucción num BRN M
+       JMP END_DEC
 
-BIT12_1:
+R1BIT12_1:
       
       MOVE.W #11, (A1)+ ;instruccion num BRZ M
+      JMP END_DEC
+      
 
 END_DEC:
-        RTS 
+      JMP RETURN
     	
     ;--- FBRDECOD: FIN SALTO A DECOD
     
@@ -149,6 +194,7 @@ DECOD:
 
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
