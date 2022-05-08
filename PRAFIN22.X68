@@ -63,16 +63,16 @@ DECOD_:
        BTST.L #14,D2
        BNE R0BIT14_1
        
-      ;si bit 14 = 0 continuar rama aqui
+      
        BTST.L #13,D2
        BNE R02BIT13_1
        
-      ;si bit 13 = 0
+      
        BTST.L #12,D2
        BNE R02BIT12_1 
        
-      ;si bit 12 = 0
-       MOVE.W #0,(A1)+  ;instrucción num TRA
+      
+       MOVE.W #0,(A1)+  ;instruccion num TRA
        JMP END_DEC
        
 R02BIT13_1:
@@ -82,32 +82,32 @@ R02BIT13_1:
        BTST.L #11,D2
        BNE R02BIT11_1
       
-       MOVE.W #3,(A1)+  ;instrucción num NAN
+       MOVE.W #3,(A1)+  ;instruccion num NAN
        JMP END_DEC
 
  
 R02BIT11_1:
-       MOVE.W #4,(A1)+  ;instrucción num STC
+       MOVE.W #4,(A1)+  ;instruccion num STC
        JMP END_DEC
        
 R022BIT12_1:
-       MOVE.W #5,(A1)+  ;instrucción num INC
+       MOVE.W #5,(A1)+  ;instruccion num INC
        JMP END_DEC
 
 R02BIT12_1: 
        BTST.L #11,D2
        BNE R022BIT11_1
       
-       MOVE.W #1,(A1)+  ;instrucción num ADD
+       MOVE.W #1,(A1)+  ;instruccion num ADD
        JMP END_DEC
        
 R022BIT11_1:
-       MOVE.W #2,(A1)+  ;instrucción num SUB
+       MOVE.W #2,(A1)+  ;instruccion num SUB
        JMP END_DEC      
 
       
       
-
+      ;si bit 14 = 1
 R0BIT14_1:
        BTST.L #13,D2
        BNE R0BIT13_1
@@ -115,21 +115,21 @@ R0BIT14_1:
        BTST.L #12,D2
        BNE R0_1_BIT12_1
        
-       MOVE.W #6,(A1)+  ;instrucci�n num LOA M
+       MOVE.W #6,(A1)+  ;instrucci�nn num LOA M
        JMP END_DEC
        
 R0BIT13_1:
        BTST.L #12,D2
        BNE R0_2_BIT12_1
-       MOVE.W #8,(A1)+   ;instrucci�n num STOM
+       MOVE.W #8,(A1)+   ;instruccion num STOM
        JMP END_DEC
 
 R0_1_BIT12_1:
-       MOVE.W #7,(A1)+ ;instrucci�n num LOAX 
+       MOVE.W #7,(A1)+ ;instruccion num LOAX
        JMP END_DEC
        
 R0_2_BIT12_1:
-       MOVE.W #9,(A1)+ ;instrucci�n num STOX
+       MOVE.W #9,(A1)+ ;instruccion num STOX
        JMP END_DEC
        
   
@@ -147,16 +147,16 @@ BIT15_1:
        BTST.L #12,D2
        BNE R1BIT12_1
        
-       MOVE.W #10,(A1)+ ;instrucci�n num BRI M
+       MOVE.W #10,(A1)+ ;instrucci�n  num BRI M
        JMP END_DEC
        
     
 R1BIT14_1:
-       MOVE.W #13,(A1)+ ;instrucci�n num STP
+       MOVE.W #13,(A1)+ ;instrucci�n num STP
        JMP END_DEC
                                      
 R1BIT13_1:
-       MOVE.W #12,(A1)+ ;instrucci�n num BRN M
+       MOVE.W #12,(A1)+ ;instruccin num BRN M
        JMP END_DEC
 
 R1BIT12_1:
@@ -234,6 +234,7 @@ DECOD:
 
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
