@@ -1,6 +1,6 @@
 *-----------------------------------------------------------
 * Title      : PRAFIN22
-* Written by : Jordi Florit Ensenyat y Marc Ferrer Fernández
+* Written by : Jordi Florit Ensenyat y Marc Ferrer Fernï¿½ndez
 * Date       : 30/05/2022
 * Description: Emulador de la JARVIS
 *-----------------------------------------------------------
@@ -19,7 +19,7 @@ ET6:    DC.W 0 ;eregistro T6
 ET7:    DC.W 0 ;eregistro T7
 ESR:    DC.W 0 ;eregistro de estado (00000000 00000ZCN)
 
-CODE:   DS.W 14 ;vector temporaneo que guarda el codigo de la instrucción
+CODE:   DS.W 14 ;vector temporaneo que guarda el codigo de la instrucciï¿½n
 
 START:
     CLR.W EPC
@@ -63,8 +63,48 @@ DECOD_:
        BTST.L #14,D2
        BNE R0BIT14_1
        
-      ;si bit 14 = continuar rama aqui
+      ;si bit 14 = 0 continuar rama aqui
+       BTST.L #13,D2
+       BNE R02BIT13_1
+       
+      ;si bit 13 = 0
+       BTST.L #12,D2
+       BNE R02BIT12_1 
+       
+      ;si bit 12 = 0
+       MOVE.W #0,(A1)+  ;instrucciÃ³n num TRA
+       JMP END_DEC
+       
+R02BIT13_1:
+       BTST.L #12,D2
+       BNE R022BIT12_1
       
+       BTST.L #11,D2
+       BNE R02BIT11_1
+      
+       MOVE.W #3,(A1)+  ;instrucciÃ³n num NAN
+       JMP END_DEC
+
+ 
+R02BIT11_1:
+       MOVE.W #4,(A1)+  ;instrucciÃ³n num STC
+       JMP END_DEC
+       
+R022BIT12_1:
+       MOVE.W #5,(A1)+  ;instrucciÃ³n num INC
+       JMP END_DEC
+
+R02BIT12_1: 
+       BTST.L #11,D2
+       BNE R022BIT11_1
+      
+       MOVE.W #1,(A1)+  ;instrucciÃ³n num ADD
+       JMP END_DEC
+       
+R022BIT11_1:
+       MOVE.W #2,(A1)+  ;instrucciÃ³n num SUB
+       JMP END_DEC      
+
       
       
 
@@ -75,21 +115,21 @@ R0BIT14_1:
        BTST.L #12,D2
        BNE R0_1_BIT12_1
        
-       MOVE.W #6,(A1)+  ;instrucción num LOA M
+       MOVE.W #6,(A1)+  ;instrucciï¿½n num LOA M
        JMP END_DEC
        
 R0BIT13_1:
        BTST.L #12,D2
        BNE R0_2_BIT12_1
-       MOVE.W #8,(A1)+   ;instrucción num STOM
+       MOVE.W #8,(A1)+   ;instrucciï¿½n num STOM
        JMP END_DEC
 
 R0_1_BIT12_1:
-       MOVE.W #7,(A1)+ ;instrucción num LOAX 
+       MOVE.W #7,(A1)+ ;instrucciï¿½n num LOAX 
        JMP END_DEC
        
 R0_2_BIT12_1:
-       MOVE.W #9,(A1)+ ;instrucción num STOX
+       MOVE.W #9,(A1)+ ;instrucciï¿½n num STOX
        JMP END_DEC
        
   
@@ -107,16 +147,16 @@ BIT15_1:
        BTST.L #12,D2
        BNE R1BIT12_1
        
-       MOVE.W #10,(A1)+ ;instrucción num BRI M
+       MOVE.W #10,(A1)+ ;instrucciï¿½n num BRI M
        JMP END_DEC
        
     
 R1BIT14_1:
-       MOVE.W #13,(A1)+ ;instrucción num STP
+       MOVE.W #13,(A1)+ ;instrucciï¿½n num STP
        JMP END_DEC
                                      
 R1BIT13_1:
-       MOVE.W #12,(A1)+ ;instrucción num BRN M
+       MOVE.W #12,(A1)+ ;instrucciï¿½n num BRN M
        JMP END_DEC
 
 R1BIT12_1:
