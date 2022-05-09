@@ -22,7 +22,8 @@ ESR:    DC.W 0 ;eregistro de estado (00000000 00000ZCN)
 CODE:   DS.W 14 ;vector temporaneo que guarda el codigo de la instruccion
 
 START:
-    CLR.W EPC
+       CLR.W EPC
+       LEA.L CODE,A1
 
 FETCH:
     ;--- IFETCH: INICIO FETCH
@@ -41,10 +42,6 @@ FETCH:
 	   MOVE.W EMEM(A0),EIR
 	   
 	   ADDQ.W #1,EPC   ;incrementar PC
-	   	   
-	   
-	    
-	    
         
     ;--- FFETCH: FIN FETCH
     
@@ -58,7 +55,11 @@ FETCH:
        MOVE.W EIR,-(SP) ;paso parametro EIR
        
        JSR DECOD
-        
+       
+       MOVE.W 2(SP),D2 ;parametro de salida
+       MOVE.W D2,(A1)+
+       ADD.L #2,SP
+       
        DBRA D0,FETCH   ;bucle temporal
     	
     ;--- FBRDECOD: FIN SALTO A DECOD
@@ -67,9 +68,9 @@ FETCH:
     ;--- IBREXEC: INICIO SALTO A FASE DE EJECUCION
         ;*** Esta seccion se usa para saltar a la fase de ejecucion
         ;*** NO HACE FALTA MODIFICARLA
-    MULU #6,D1
-    MOVEA.L D1,A1
-    JMP JMPLIST(A1)
+       MULU #6,D1
+       MOVEA.L D1,A1
+       JMP JMPLIST(A1)
 JMPLIST:
     JMP ETRA
     JMP EADD
@@ -123,7 +124,13 @@ ESTP:
         ;*** decodificacion, que debera ser de libreria, siguiendo la interfaz
         ;*** especificada en el enunciado
 DECOD:
+;guardar registros en la pila
 
+       MOVE.W D0,-(SP)
+       MOVE.W D1,-(SP)
+       
+       MOVE.W 8(SP),D2
+       
        BTST.L #15,D2
        BNE BIT15_1   
        
@@ -140,7 +147,7 @@ DECOD:
        BNE R02BIT12_1 
        
       
-       MOVE.W #0,(A1)+  ;instruccion num TRA
+       MOVE.W #0,14(SP)  ;instruccion num TRA
        JMP END_DEC
        
 R02BIT13_1:
@@ -150,27 +157,27 @@ R02BIT13_1:
        BTST.L #11,D2
        BNE R02BIT11_1
       
-       MOVE.W #3,(A1)+  ;instruccion num NAN
+       MOVE.W #3,14(SP)  ;instruccion num NAN
        JMP END_DEC
 
  
 R02BIT11_1:
-       MOVE.W #4,(A1)+  ;instruccion num STC
+       MOVE.W #4,14(SP)  ;instruccion num STC
        JMP END_DEC
        
 R022BIT12_1:
-       MOVE.W #5,(A1)+  ;instruccion num INC
+       MOVE.W #5,14(SP)  ;instruccion num INC
        JMP END_DEC
 
 R02BIT12_1: 
        BTST.L #11,D2
        BNE R022BIT11_1
       
-       MOVE.W #1,(A1)+  ;instruccion num ADD
+       MOVE.W #1,14(SP)  ;instruccion num ADD
        JMP END_DEC
        
 R022BIT11_1:
-       MOVE.W #2,(A1)+  ;instruccion num SUB
+       MOVE.W #2,14(SP)  ;instruccion num SUB
        JMP END_DEC      
 
       
@@ -183,21 +190,21 @@ R0BIT14_1:
        BTST.L #12,D2
        BNE R0_1_BIT12_1
        
-       MOVE.W #6,(A1)+  ;instrucciónn num LOA M
+       MOVE.W #6,14(SP)  ;instrucciónn num LOA M
        JMP END_DEC
        
 R0BIT13_1:
        BTST.L #12,D2
        BNE R0_2_BIT12_1
-       MOVE.W #8,(A1)+   ;instruccion num STOM
+       MOVE.W #8,14(SP)   ;instruccion num STOM
        JMP END_DEC
 
 R0_1_BIT12_1:
-       MOVE.W #7,(A1)+ ;instruccion num LOAX
+       MOVE.W #7,14(SP) ;instruccion num LOAX
        JMP END_DEC
        
 R0_2_BIT12_1:
-       MOVE.W #9,(A1)+ ;instruccion num STOX
+       MOVE.W #9,14(SP) ;instruccion num STOX
        JMP END_DEC
        
   
@@ -215,29 +222,33 @@ BIT15_1:
        BTST.L #12,D2
        BNE R1BIT12_1
        
-       MOVE.W #10,(A1)+ ;instrucción  num BRI M
+       MOVE.W #10,14(SP) ;instrucción  num BRI M
        JMP END_DEC
        
     
 R1BIT14_1:
-       MOVE.W #13,(A1)+ ;instrucción num STP
+       MOVE.W #13,14(SP) ;instrucción num STP
        JMP END_DEC
                                      
 R1BIT13_1:
-       MOVE.W #12,(A1)+ ;instruccin num BRN M
+       MOVE.W #12,14(SP) ;instruccin num BRN M
        JMP END_DEC
 
 R1BIT12_1:
       
-      MOVE.W #11, (A1)+ ;instruccion num BRZ M
+      MOVE.W #11,14(SP) ;instruccion num BRZ M
       JMP END_DEC
       
 
 END_DEC:
 
+;devolver los valores a los registros desde la pila
+      MOVE.W (SP)+,D1
+      MOVE.W (SP)+,D0
+      CLR.W D2
+      
       RTS
       
-
     ;--- FDECOD: FIN DECOD
     END    START
 
