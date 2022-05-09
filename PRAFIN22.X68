@@ -54,12 +54,11 @@ FETCH:
         ;*** DECOD, llamar a la subrutina, y vaciar la pila correctamente,
         ;*** almacenando el resultado de la decodificacion en D1
         
-       SUB.W #2,SP ;reerva espacio resultado
+       SUB.W #2,SP ;reserva espacio resultado
+       MOVE.W EIR,-(SP) ;paso parametro EIR
        
+       JSR DECOD
         
-        
-       
-       
        DBRA D0,FETCH   ;bucle temporal
     	
     ;--- FBRDECOD: FIN SALTO A DECOD
@@ -235,10 +234,13 @@ R1BIT12_1:
       
 
 END_DEC:
+
+      RTS
       
 
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
