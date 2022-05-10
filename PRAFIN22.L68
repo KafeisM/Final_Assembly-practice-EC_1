@@ -1,6 +1,6 @@
 00001060 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 09/05/2022 17:47:02
+Created On: 10/05/2022 10:28:55
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : PRAFIN22
@@ -26,8 +26,8 @@ Created On: 09/05/2022 17:47:02
 00001044                            22  CODE:   DS.W 14 ;vector temporaneo que guarda el codigo de la instruccion
 00001060                            23  
 00001060                            24  START:
-00001060  4278 1030                 25      CLR.W EPC
-00001064  43F8 1044                 26      LEA.L CODE,A1
+00001060  4278 1030                 25         CLR.W EPC
+00001064  43F8 1044                 26         LEA.L CODE,A1
 00001068                            27  
 00001068                            28  FETCH:
 00001068                            29      ;--- IFETCH: INICIO FETCH
@@ -72,9 +72,9 @@ Created On: 09/05/2022 17:47:02
 0000109C                            68      ;--- IBREXEC: INICIO SALTO A FASE DE EJECUCION
 0000109C                            69          ;*** Esta seccion se usa para saltar a la fase de ejecucion
 0000109C                            70          ;*** NO HACE FALTA MODIFICARLA
-0000109C  C2FC 0006                 71      MULU #6,D1
-000010A0  2241                      72      MOVEA.L D1,A1
-000010A2  4EE9 10A6                 73      JMP JMPLIST(A1)
+0000109C  C2FC 0006                 71         MULU #6,D1
+000010A0  2241                      72         MOVEA.L D1,A1
+000010A2  4EE9 10A6                 73         JMP JMPLIST(A1)
 000010A6                            74  JMPLIST:
 000010A6  4EF9 000010FA             75      JMP ETRA
 000010AC  4EF9 000010FA             76      JMP EADD
@@ -253,9 +253,8 @@ Created On: 09/05/2022 17:47:02
 00001218                           249        
 00001218  4E75                     250        RTS
 0000121A                           251        
-0000121A                           252  
-0000121A                           253      ;--- FDECOD: FIN DECOD
-0000121A                           254      END    START
+0000121A                           252      ;--- FDECOD: FIN DECOD
+0000121A                           253      END    START
 
 No errors detected
 No warnings generated
