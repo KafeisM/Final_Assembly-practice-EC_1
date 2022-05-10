@@ -61,6 +61,8 @@ FETCH:
        ADD.L #2,SP
        
        DBRA D0,FETCH   ;bucle temporal
+       
+       SIMHALT  ;TEMPORAL
     	
     ;--- FBRDECOD: FIN SALTO A DECOD
     
@@ -251,6 +253,7 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
