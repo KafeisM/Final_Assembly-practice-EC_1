@@ -1,6 +1,6 @@
 00001060 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 10/05/2022 10:28:55
+Created On: 10/05/2022 19:54:51
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : PRAFIN22
@@ -151,7 +151,7 @@ Created On: 10/05/2022 10:28:55
 0000111E  6600 0042                147         BNE R02BIT12_1 
 00001122                           148         
 00001122                           149        
-00001122  3F7C 0000 000E           150         MOVE.W #0,14(SP)  ;instruccion num TRA
+00001122  3F7C 0000 000A           150         MOVE.W #0,10(SP)  ;instruccion num TRA
 00001128  4EF9 00001212            151         JMP END_DEC
 0000112E                           152         
 0000112E                           153  R02BIT13_1:
@@ -161,27 +161,27 @@ Created On: 10/05/2022 10:28:55
 00001136  0802 000B                157         BTST.L #11,D2
 0000113A  6600 000E                158         BNE R02BIT11_1
 0000113E                           159        
-0000113E  3F7C 0003 000E           160         MOVE.W #3,14(SP)  ;instruccion num NAN
+0000113E  3F7C 0003 000A           160         MOVE.W #3,10(SP)  ;instruccion num NAN
 00001144  4EF9 00001212            161         JMP END_DEC
 0000114A                           162  
 0000114A                           163   
 0000114A                           164  R02BIT11_1:
-0000114A  3F7C 0004 000E           165         MOVE.W #4,14(SP)  ;instruccion num STC
+0000114A  3F7C 0004 000A           165         MOVE.W #4,10(SP)  ;instruccion num STC
 00001150  4EF9 00001212            166         JMP END_DEC
 00001156                           167         
 00001156                           168  R022BIT12_1:
-00001156  3F7C 0005 000E           169         MOVE.W #5,14(SP)  ;instruccion num INC
+00001156  3F7C 0005 000A           169         MOVE.W #5,10(SP)  ;instruccion num INC
 0000115C  4EF9 00001212            170         JMP END_DEC
 00001162                           171  
 00001162                           172  R02BIT12_1: 
 00001162  0802 000B                173         BTST.L #11,D2
 00001166  6600 000E                174         BNE R022BIT11_1
 0000116A                           175        
-0000116A  3F7C 0001 000E           176         MOVE.W #1,14(SP)  ;instruccion num ADD
+0000116A  3F7C 0001 000A           176         MOVE.W #1,10(SP)  ;instruccion num ADD
 00001170  4EF9 00001212            177         JMP END_DEC
 00001176                           178         
 00001176                           179  R022BIT11_1:
-00001176  3F7C 0002 000E           180         MOVE.W #2,14(SP)  ;instruccion num SUB
+00001176  3F7C 0002 000A           180         MOVE.W #2,10(SP)  ;instruccion num SUB
 0000117C  4EF9 00001212            181         JMP END_DEC      
 00001182                           182  
 00001182                           183        
@@ -194,21 +194,21 @@ Created On: 10/05/2022 10:28:55
 0000118A  0802 000C                190         BTST.L #12,D2
 0000118E  6600 0022                191         BNE R0_1_BIT12_1
 00001192                           192         
-00001192  3F7C 0006 000E           193         MOVE.W #6,14(SP)  ;instrucciónn num LOA M
+00001192  3F7C 0006 000A           193         MOVE.W #6,10(SP)  ;instrucciónn num LOA M
 00001198  4EF9 00001212            194         JMP END_DEC
 0000119E                           195         
 0000119E                           196  R0BIT13_1:
 0000119E  0802 000C                197         BTST.L #12,D2
 000011A2  6600 001A                198         BNE R0_2_BIT12_1
-000011A6  3F7C 0008 000E           199         MOVE.W #8,14(SP)   ;instruccion num STOM
+000011A6  3F7C 0008 000A           199         MOVE.W #8,10(SP)   ;instruccion num STOM
 000011AC  4EF9 00001212            200         JMP END_DEC
 000011B2                           201  
 000011B2                           202  R0_1_BIT12_1:
-000011B2  3F7C 0007 000E           203         MOVE.W #7,14(SP) ;instruccion num LOAX
+000011B2  3F7C 0007 000A           203         MOVE.W #7,10(SP) ;instruccion num LOAX
 000011B8  4EF9 00001212            204         JMP END_DEC
 000011BE                           205         
 000011BE                           206  R0_2_BIT12_1:
-000011BE  3F7C 0009 000E           207         MOVE.W #9,14(SP) ;instruccion num STOX
+000011BE  3F7C 0009 000A           207         MOVE.W #9,10(SP) ;instruccion num STOX
 000011C4  4EF9 00001212            208         JMP END_DEC
 000011CA                           209         
 000011CA                           210    
@@ -226,21 +226,21 @@ Created On: 10/05/2022 10:28:55
 000011DA  0802 000C                222         BTST.L #12,D2
 000011DE  6600 0026                223         BNE R1BIT12_1
 000011E2                           224         
-000011E2  3F7C 000A 000E           225         MOVE.W #10,14(SP) ;instrucción  num BRI M
+000011E2  3F7C 000A 000A           225         MOVE.W #10,10(SP) ;instrucción  num BRI M
 000011E8  4EF9 00001212            226         JMP END_DEC
 000011EE                           227         
 000011EE                           228      
 000011EE                           229  R1BIT14_1:
-000011EE  3F7C 000D 000E           230         MOVE.W #13,14(SP) ;instrucción num STP
+000011EE  3F7C 000D 000A           230         MOVE.W #13,10(SP) ;instrucción num STP
 000011F4  4EF9 00001212            231         JMP END_DEC
 000011FA                           232                                       
 000011FA                           233  R1BIT13_1:
-000011FA  3F7C 000C 000E           234         MOVE.W #12,14(SP) ;instruccin num BRN M
+000011FA  3F7C 000C 000A           234         MOVE.W #12,10(SP) ;instruccin num BRN M
 00001200  4EF9 00001212            235         JMP END_DEC
 00001206                           236  
 00001206                           237  R1BIT12_1:
 00001206                           238        
-00001206  3F7C 000B 000E           239        MOVE.W #11,14(SP) ;instruccion num BRZ M
+00001206  3F7C 000B 000A           239        MOVE.W #11,10(SP) ;instruccion num BRZ M
 0000120C  4EF9 00001212            240        JMP END_DEC
 00001212                           241        
 00001212                           242  
