@@ -19,11 +19,9 @@ ET6:    DC.W 0 ;eregistro T6
 ET7:    DC.W 0 ;eregistro T7
 ESR:    DC.W 0 ;eregistro de estado (00000000 00000ZCN)
 
-CODE:   DS.W 14 ;vector temporaneo que guarda el codigo de la instruccion
-
 START:
        CLR.W EPC
-       LEA.L CODE,A1
+
 
 FETCH:
     ;--- IFETCH: INICIO FETCH
@@ -35,9 +33,9 @@ FETCH:
 	   SUBQ.W #1,D0
 	   
 	   MOVE.W EPC,A0
-	   MOVE.L A0,D1
-	   MULU #2,D1
-       MOVE.L D1,A0
+	   MOVE.L A0,D2
+	   MULU #2,D2
+       MOVE.L D2,A0
    
 	   MOVE.W EMEM(A0),EIR
 	   
@@ -56,13 +54,10 @@ FETCH:
        
        JSR DECOD
        
-       MOVE.W 2(SP),D2 ;parametro de salida
-       MOVE.W D2,(A1)+
+       MOVE.W 2(SP),D1 ;parametro de salida
        ADD.L #2,SP
        
-       DBRA D0,FETCH   ;bucle temporal
        
-       SIMHALT  ;TEMPORAL
     	
     ;--- FBRDECOD: FIN SALTO A DECOD
     
@@ -96,6 +91,7 @@ JMPLIST:
 	
 	; ESCRIBID EN CADA ETIQUETA LA FASE DE EJECUCION DE CADA INSTRUCCION
 ETRA:
+    JSR TRA
 EADD:
 ESUB:
 ENAN:
@@ -111,12 +107,17 @@ EBRN:
 ESTP:
     ;--- FEXEC: FIN EJECUCION
     
+       DBRA D0,FETCH   ;bucle temporal
+       
+       SIMHALT  ;TEMPORAL
 
     ;--- ISUBR: INICIO SUBRUTINAS
         ;*** Aqui debeis incluir las subrutinas que necesite vuestra solucion
         ;*** SALVO DECOD, que va en la siguiente seccion
 
-	    ; ESCRIBID VUESTRO CODIGO AQUI
+TRA:
+
+    RTS
         
     ;--- FSUBR: FIN SUBRUTINAS
     
@@ -129,7 +130,7 @@ DECOD:
 ;guardar registros en la pila
 
        MOVE.W D0,-(SP)
-       MOVE.W D1,-(SP)
+       MOVE.W D2,-(SP)
        
        MOVE.W 8(SP),D2
        
@@ -245,14 +246,15 @@ R1BIT12_1:
 END_DEC:
 
 ;devolver los valores a los registros desde la pila
-      MOVE.W (SP)+,D1
+      MOVE.W (SP)+,D2
       MOVE.W (SP)+,D0
-      CLR.W D2
+
       
       RTS
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
