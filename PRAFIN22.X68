@@ -57,8 +57,6 @@ FETCH:
        MOVE.W 2(SP),D1 ;parametro de salida
        ADD.L #2,SP
        
-       
-    	
     ;--- FBRDECOD: FIN SALTO A DECOD
     
     
@@ -88,14 +86,39 @@ JMPLIST:
     
     ;--- IEXEC: INICIO EJECUCION
         ;*** En esta seccion debeis implementar la ejecucion de cada einstr.
+        
+        ;registros que NO se pueden usar D0,D1,D2,A0 
 	
 	; ESCRIBID EN CADA ETIQUETA LA FASE DE EJECUCION DE CADA INSTRUCCION
 ETRA:
-    JSR TRA
+    ;mover aaa a la posicion menos significativa
+    MOVE.W EIR,D3
+    AND.W #$00F0,D3
+    LSR.L #4,D3
+
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de aaa en decimal
+    
+    
+    
+    
+    
 EADD:
 ESUB:
 ENAN:
 ESTC:
+    MOVE.W EIR,D3
+    AND.W #$0F00,D3
+    LSR.L #8,D3
+
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de bbb en decimal
+    
+    ;cojer constante k
+    
+    ;guardarlo en el registro indicado (D4 <--- [D5])
+    
+
 EINC:
 ELOA:
 ELOAX:
@@ -105,6 +128,7 @@ EBRI:
 EBRZ:
 EBRN:
 ESTP:
+       
     ;--- FEXEC: FIN EJECUCION
     
        DBRA D0,FETCH   ;bucle temporal
@@ -114,10 +138,76 @@ ESTP:
     ;--- ISUBR: INICIO SUBRUTINAS
         ;*** Aqui debeis incluir las subrutinas que necesite vuestra solucion
         ;*** SALVO DECOD, que va en la siguiente seccion
+DECOD_VALOR:
+    MOVE.W #0,D4
+    
+    BTST #0,D3
+    BEQ CERO1
+    ADD.W #1,D4
+    
+CERO1:
+    BTST #1,D3
+    BEQ CERO2
+    ADD.W #2,D4
+    
+CERO2:   
+    BTST #2,D3
+    BEQ CERO3
+    ADD.W #4,D4
+    
+CERO3:
+    RTS
+    
+COJER_CONTENIDO:
+    ;coje el contenido de la posicion de memoria y lo almacena en D5
+    
+    CMP #0,D4 ;B0
+    BNE AUX0
+    MOVE EB0,D5
+    
+AUX0:
+    CMP #1,D4 ;B1
+    BNE AUX1
+    MOVE EB1,D5
+    
+AUX1:    
+    CMP #2,D4 ;R2
+    BNE AUX2
+    MOVE ER2,D5
+    
+AUX2:    
+    CMP #3,D4 ;R3
+    BNE AUX3
+    MOVE ER3,D5
 
-TRA:
+AUX3:    
+    CMP #4,D4 ;R4
+    BNE AUX4
+    MOVE ER4,D5
+
+AUX4:    
+    CMP #5,D4 ;R5
+    BNE AUX5
+    MOVE ER5,D5
+
+AUX5:    
+    CMP #6,D4 ;T6
+    BNE AUX6
+    MOVE ET6,D5
+    
+AUX6:   
+    CMP #7,D4 ;T7
+    BNE AUX7
+    MOVE ET7,D5
+    
+AUX7:
+    RTS
+    
+GUARDAR_CONTENIDO:
+    ;guarda el contenido de 
 
     RTS
+
         
     ;--- FSUBR: FIN SUBRUTINAS
     
@@ -254,6 +344,7 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
