@@ -90,6 +90,7 @@ JMPLIST:
         ;registros que NO se pueden usar D0,D1,D2,A0 
 	
 	; ESCRIBID EN CADA ETIQUETA LA FASE DE EJECUCION DE CADA INSTRUCCION
+	
 ETRA:
     ;mover aaa a la posicion menos significativa
     MOVE.W EIR,D3
@@ -98,11 +99,26 @@ ETRA:
 
     JSR DECOD_VALOR
     ;en D4 esta el valor de aaa en decimal
+    JSR COJER_CONTENIDO
+    ;en D5 esta el contenido de el eregistro Xa
+    
+    ;mirar donde guardar el contenido de Xa
+    MOVE.W EIR,D3
+    AND.W #$0F00,D3
+    LSR.L #8,D3
+    
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de bbb en decimal
+    JSR GUARDAR_CONTENIDO
+    
+    ;actualizar flags Z y N
     
     
-    
-    
-    
+    ;limpiar los registros usados
+    CLR.W D3
+    CLR.W D4
+    CLR.W D5
+       
 EADD:
 ESUB:
 ENAN:
@@ -204,8 +220,50 @@ AUX7:
     RTS
     
 GUARDAR_CONTENIDO:
-    ;guarda el contenido de 
+    ;guarda el contenido de D5 en la posicion indicada por D4
+    
+    CMP #0,D4 ;B0
+    BNE AUX0_
+    MOVE D5,EB0
+    
+AUX0_:
+    CMP #1,D4 ;B1
+    BNE AUX1_
+    MOVE D5,EB1
+    
+AUX1_:    
+    CMP #2,D4 ;R2
+    BNE AUX2_
+    MOVE D5,ER2
+    
+AUX2_:    
+    CMP #3,D4 ;R3
+    BNE AUX3_
+    MOVE D5,ER3
 
+AUX3_:    
+    CMP #4,D4 ;R4
+    BNE AUX4_
+    MOVE D5,ER4
+
+AUX4_:    
+    CMP #5,D4 ;R5
+    BNE AUX5_
+    MOVE D5,ER5
+
+AUX5_:    
+    CMP #6,D4 ;T6
+    BNE AUX6_
+    MOVE D5,ET6
+    
+AUX6_:   
+    CMP #7,D4 ;T7
+    BNE AUX7_
+    MOVE D5,ET7
+    
+AUX7_:
+
+    
     RTS
 
         
@@ -344,6 +402,7 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
