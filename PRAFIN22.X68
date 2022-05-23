@@ -112,14 +112,81 @@ ETRA:
     JSR GUARDAR_CONTENIDO
     
     ;actualizar flags Z y N
+    CMP #0,D5
+    BNE NO_CERO
+    BSET.B #2,ESR
+    BRA CERO_PUESTO
+NO_CERO:
+    BCLR.B #2,ESR
+CERO_PUESTO:
     
-    
+    BTST D5,#15
+    BNE ES_1
+    BCLR.B #0,ESR
+    BRA CERO_PUESTO1
+ES_1:
+    BSET.B #0,ESR
+CERO_PUESTO1:
+
     ;limpiar los registros usados
     CLR.W D3
     CLR.W D4
-    CLR.W D5
-       
+    CLR.W D5    
 EADD:
+    ;mover aaa a la posicion menos significativa
+    MOVE.W EIR,D3
+    AND.W #$00F0,D3
+    LSR.L #4,D3
+
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de aaa en decimal
+    JSR COJER_CONTENIDO
+    ;en D5 esta el contenido de el eregistro Xa
+    MOVE.W D5,D6
+    
+    ;mirar el operando b
+    MOVE.W EIR,D3
+    AND.W #$0F00,D3
+    LSR.L #8,D3
+    
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de bbb en decimal
+    JSR COJER_CONTENIDO
+    ;en D5 esta el contenido de bbb
+    
+    ADD.W D5,D6
+    ;resultado suma en D5
+    
+    JSR GUARDAR_CONTENIDO
+    ;D4 es bbb, guardar contenido ahi
+    
+    ;actualizar flags Z,N
+    CMP #0,D5
+    BNE _NO_CERO
+    BSET.B #2,ESR
+    BRA CERO_PUESTO2
+_NO_CERO:
+    BCLR.B #2,ESR
+CERO_PUESTO2:
+    BTST.B D5,#15
+    BNE _ES_1
+    BCLR.B #0,ESR
+    BRA CERO_PUESTO3
+_ES_1:
+    BSET.B #0,ESR
+CERO_PUESTO3:
+    
+    ;actualizar flag C
+    
+
+    
+    
+    
+    
+    
+
+    
+    
 ESUB:
 ENAN:
 ESTC:
@@ -265,6 +332,15 @@ AUX7_:
 
     
     RTS
+    
+FLAG_C:
+    MOVE.W SR,D6
+    BTST.W D6,#0
+
+    
+
+
+    RTS
 
         
     ;--- FSUBR: FIN SUBRUTINAS
@@ -402,6 +478,7 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
