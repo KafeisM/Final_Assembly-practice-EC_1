@@ -1,6 +1,6 @@
 00001044 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 23/05/2022 18:11:09
+Created On: 23/05/2022 23:16:58
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : PRAFIN22
@@ -32,446 +32,508 @@ Created On: 23/05/2022 18:11:09
 00001048                            28          ;*** En esta seccion debeis introducir el codigo necesario para cargar
 00001048                            29          ;*** en el EIR la siguiente instruccion a ejecutar, indicada por el EPC,
 00001048                            30          ;*** y dejar listo el EPC para que apunte a la siguiente instruccion
-00001048                            31          
-00001048  303C 000E                 32         MOVE.W #14,D0    ;bucle de 14 iteraciones
-0000104C  5340                      33         SUBQ.W #1,D0
-0000104E                            34         
-0000104E  3078 1030                 35         MOVE.W EPC,A0
-00001052  2408                      36         MOVE.L A0,D2
-00001054  C4FC 0002                 37         MULU #2,D2
-00001058  2042                      38         MOVE.L D2,A0
-0000105A                            39     
-0000105A  31E8 1000 102E            40         MOVE.W EMEM(A0),EIR
-00001060                            41         
-00001060  5278 1030                 42         ADDQ.W #1,EPC   ;incrementar PC
-00001064                            43          
-00001064                            44      ;--- FFETCH: FIN FETCH
-00001064                            45      
-00001064                            46      
-00001064                            47      ;--- IBRDECOD: INICIO SALTO A DECOD
-00001064                            48          ;*** En esta seccion debeis preparar la pila para llamar a la subrutina
-00001064                            49          ;*** DECOD, llamar a la subrutina, y vaciar la pila correctamente,
-00001064                            50          ;*** almacenando el resultado de la decodificacion en D1
-00001064                            51          
-00001064  554F                      52         SUB.W #2,SP ;reserva espacio resultado
-00001066  3F38 102E                 53         MOVE.W EIR,-(SP) ;paso parametro EIR
-0000106A                            54         
-0000106A  4EB9 000012A4             55         JSR DECOD
+00001048                            31         
+00001048  3078 1030                 32         MOVE.W EPC,A0
+0000104C  2408                      33         MOVE.L A0,D2
+0000104E  C4FC 0002                 34         MULU #2,D2
+00001052  2042                      35         MOVE.L D2,A0
+00001054                            36     
+00001054  31E8 1000 102E            37         MOVE.W EMEM(A0),EIR
+0000105A                            38         
+0000105A  5278 1030                 39         ADDQ.W #1,EPC   ;incrementar PC
+0000105E                            40          
+0000105E                            41      ;--- FFETCH: FIN FETCH
+0000105E                            42      
+0000105E                            43      
+0000105E                            44      ;--- IBRDECOD: INICIO SALTO A DECOD
+0000105E                            45          ;*** En esta seccion debeis preparar la pila para llamar a la subrutina
+0000105E                            46          ;*** DECOD, llamar a la subrutina, y vaciar la pila correctamente,
+0000105E                            47          ;*** almacenando el resultado de la decodificacion en D1
+0000105E                            48          
+0000105E  554F                      49         SUB.W #2,SP ;reserva espacio resultado
+00001060  3F38 102E                 50         MOVE.W EIR,-(SP) ;paso parametro EIR
+00001064                            51         
+00001064  4EB9 00001330             52         JSR DECOD
+0000106A                            53         
+0000106A  322F 0002                 54         MOVE.W 2(SP),D1 ;parametro de salida
+0000106E  548F                      55         ADD.L #2,SP
 00001070                            56         
-00001070  322F 0002                 57         MOVE.W 2(SP),D1 ;parametro de salida
-00001074  548F                      58         ADD.L #2,SP
-00001076                            59         
-00001076                            60      ;--- FBRDECOD: FIN SALTO A DECOD
-00001076                            61      
-00001076                            62      
-00001076                            63      ;--- IBREXEC: INICIO SALTO A FASE DE EJECUCION
-00001076                            64          ;*** Esta seccion se usa para saltar a la fase de ejecucion
-00001076                            65          ;*** NO HACE FALTA MODIFICARLA
-00001076  C2FC 0006                 66         MULU #6,D1
-0000107A  2241                      67         MOVEA.L D1,A1
-0000107C  4EE9 1080                 68         JMP JMPLIST(A1)
-00001080                            69  JMPLIST:
-00001080  4EF9 000010D4             70      JMP ETRA
-00001086  4EF9 00001136             71      JMP EADD
-0000108C  4EF9 0000119C             72      JMP ESUB
-00001092  4EF9 0000119C             73      JMP ENAN
-00001098  4EF9 0000119C             74      JMP ESTC
-0000109E  4EF9 000011AC             75      JMP EINC
-000010A4  4EF9 000011AC             76      JMP ELOA
-000010AA  4EF9 000011AC             77      JMP ELOAX
-000010B0  4EF9 000011AC             78      JMP ESTO
-000010B6  4EF9 000011AC             79      JMP ESTOX
-000010BC  4EF9 000011AC             80      JMP EBRI
-000010C2  4EF9 000011AC             81      JMP EBRZ
-000010C8  4EF9 000011AC             82      JMP EBRN
-000010CE  4EF9 000011AC             83      JMP ESTP
-000010D4                            84      ;--- FBREXEC: FIN SALTO A FASE DE EJECUCION
-000010D4                            85      
-000010D4                            86      
-000010D4                            87      ;--- IEXEC: INICIO EJECUCION
-000010D4                            88          ;*** En esta seccion debeis implementar la ejecucion de cada einstr.
-000010D4                            89          
-000010D4                            90          ;registros que NO se pueden usar D0,D1,D2,A0 
-000010D4                            91      
-000010D4                            92      ; ESCRIBID EN CADA ETIQUETA LA FASE DE EJECUCION DE CADA INSTRUCCION
-000010D4                            93      
-000010D4                            94  ETRA:
-000010D4                            95      ;mover aaa a la posicion menos significativa
-000010D4  3638 102E                 96      MOVE.W EIR,D3
-000010D8  C67C 00F0                 97      AND.W #$00F0,D3
-000010DC  E88B                      98      LSR.L #4,D3
-000010DE                            99  
-000010DE  4EB9 000011B4            100      JSR DECOD_VALOR
-000010E4                           101      ;en D4 esta el valor de aaa en decimal
-000010E4  4EB9 000011D8            102      JSR COJER_CONTENIDO
-000010EA                           103      ;en D5 esta el contenido de el eregistro Xa
-000010EA                           104      
-000010EA                           105      ;mirar donde guardar el contenido de Xa
-000010EA  3638 102E                106      MOVE.W EIR,D3
-000010EE  C67C 0F00                107      AND.W #$0F00,D3
-000010F2  E08B                     108      LSR.L #8,D3
-000010F4                           109      
-000010F4  4EB9 000011B4            110      JSR DECOD_VALOR
-000010FA                           111      ;en D4 esta el valor de bbb en decimal
-000010FA  4EB9 0000123A            112      JSR GUARDAR_CONTENIDO
+00001070                            57      ;--- FBRDECOD: FIN SALTO A DECOD
+00001070                            58      
+00001070                            59      
+00001070                            60      ;--- IBREXEC: INICIO SALTO A FASE DE EJECUCION
+00001070                            61          ;*** Esta seccion se usa para saltar a la fase de ejecucion
+00001070                            62          ;*** NO HACE FALTA MODIFICARLA
+00001070  C2FC 0006                 63         MULU #6,D1
+00001074  2241                      64         MOVEA.L D1,A1
+00001076  4EE9 107A                 65         JMP JMPLIST(A1)
+0000107A                            66  JMPLIST:
+0000107A  4EF9 000010CE             67      JMP ETRA
+00001080  4EF9 0000110A             68      JMP EADD
+00001086  4EF9 0000115A             69      JMP ESUB
+0000108C  4EF9 0000115E             70      JMP ENAN
+00001092  4EF9 00001162             71      JMP ESTC
+00001098  4EF9 00001196             72      JMP EINC
+0000109E  4EF9 000011DC             73      JMP ELOA
+000010A4  4EF9 000011E0             74      JMP ELOAX
+000010AA  4EF9 000011E4             75      JMP ESTO
+000010B0  4EF9 000011E8             76      JMP ESTOX
+000010B6  4EF9 000011EC             77      JMP EBRI
+000010BC  4EF9 000011F0             78      JMP EBRZ
+000010C2  4EF9 000011F4             79      JMP EBRN
+000010C8  4EF9 000011F8             80      JMP ESTP
+000010CE                            81      ;--- FBREXEC: FIN SALTO A FASE DE EJECUCION
+000010CE                            82      
+000010CE                            83      
+000010CE                            84      ;--- IEXEC: INICIO EJECUCION
+000010CE                            85          ;*** En esta seccion debeis implementar la ejecucion de cada einstr.
+000010CE                            86          
+000010CE                            87          ;registros que NO se pueden usar D0,D1,D2,A0 
+000010CE                            88      
+000010CE                            89      ; ESCRIBID EN CADA ETIQUETA LA FASE DE EJECUCION DE CADA INSTRUCCION
+000010CE                            90      
+000010CE                            91  ETRA:
+000010CE                            92      ;mover aaa a la posicion menos significativa
+000010CE  3638 102E                 93      MOVE.W EIR,D3
+000010D2  C67C 00F0                 94      AND.W #$00F0,D3
+000010D6  E88B                      95      LSR.L #4,D3
+000010D8                            96  
+000010D8  4EB9 000011FC             97      JSR DECOD_VALOR
+000010DE                            98      ;en D4 esta el valor de aaa en decimal
+000010DE  4EB9 00001220             99      JSR COJER_CONTENIDO
+000010E4                           100      ;en D5 esta el contenido de el eregistro Xa
+000010E4                           101      
+000010E4                           102      ;mirar donde guardar el contenido de Xa
+000010E4  3638 102E                103      MOVE.W EIR,D3
+000010E8  C67C 0F00                104      AND.W #$0F00,D3
+000010EC  E08B                     105      LSR.L #8,D3
+000010EE                           106      
+000010EE  4EB9 000011FC            107      JSR DECOD_VALOR
+000010F4                           108      ;en D4 esta el valor de bbb en decimal
+000010F4  4EB9 00001282            109      JSR GUARDAR_CONTENIDO
+000010FA                           110      
+000010FA                           111      ;actualizar flags Z y N
+000010FA  4EB9 000012E4            112      JSR ACT_FLAGS
 00001100                           113      
-00001100                           114      ;actualizar flags Z y N
-00001100  BA7C 0000                115      CMP #0,D5
-00001104  6600 000C                116      BNE NO_CERO
-00001108  08F8 0002 1042           117      BSET.B #2,ESR
-0000110E  6000 0008                118      BRA CERO_PUESTO
-00001112                           119  NO_CERO:
-00001112  08B8 0002 1042           120      BCLR.B #2,ESR
-00001118                           121  CERO_PUESTO:
-00001118                           122      
-00001118  0B3C 000F                123      BTST D5,#15
-0000111C  6600 000C                124      BNE ES_1
-00001120  08B8 0000 1042           125      BCLR.B #0,ESR
-00001126  6000 0008                126      BRA CERO_PUESTO1
-0000112A                           127  ES_1:
-0000112A  08F8 0000 1042           128      BSET.B #0,ESR
-00001130                           129  CERO_PUESTO1:
-00001130                           130  
-00001130                           131      ;limpiar los registros usados
-00001130  4243                     132      CLR.W D3
-00001132  4244                     133      CLR.W D4
-00001134  4245                     134      CLR.W D5    
-00001136                           135  EADD:
-00001136                           136      ;mover aaa a la posicion menos significativa
-00001136  3638 102E                137      MOVE.W EIR,D3
-0000113A  C67C 00F0                138      AND.W #$00F0,D3
-0000113E  E88B                     139      LSR.L #4,D3
-00001140                           140  
-00001140  4EB9 000011B4            141      JSR DECOD_VALOR
-00001146                           142      ;en D4 esta el valor de aaa en decimal
-00001146  4EB9 000011D8            143      JSR COJER_CONTENIDO
-0000114C                           144      ;en D5 esta el contenido de el eregistro Xa
-0000114C  3C05                     145      MOVE.W D5,D6
-0000114E                           146      
-0000114E                           147      ;mirar el operando b
-0000114E  3638 102E                148      MOVE.W EIR,D3
-00001152  C67C 0F00                149      AND.W #$0F00,D3
-00001156  E08B                     150      LSR.L #8,D3
-00001158                           151      
-00001158  4EB9 000011B4            152      JSR DECOD_VALOR
-0000115E                           153      ;en D4 esta el valor de bbb en decimal
-0000115E  4EB9 000011D8            154      JSR COJER_CONTENIDO
-00001164                           155      ;en D5 esta el contenido de bbb
-00001164                           156      
-00001164  DC45                     157      ADD.W D5,D6
-00001166                           158      ;resultado suma en D5
-00001166                           159      
-00001166  4EB9 0000123A            160      JSR GUARDAR_CONTENIDO
-0000116C                           161      ;D4 es bbb, guardar contenido ahi
-0000116C                           162      
-0000116C                           163      ;actualizar flags Z,N
-0000116C  BA7C 0000                164      CMP #0,D5
-00001170  6600 000C                165      BNE _NO_CERO
-00001174  08F8 0002 1042           166      BSET.B #2,ESR
-0000117A  6000 0008                167      BRA CERO_PUESTO2
-0000117E                           168  _NO_CERO:
-0000117E  08B8 0002 1042           169      BCLR.B #2,ESR
-00001184                           170  CERO_PUESTO2:
-00001184                           171  
-00001184  0B3C 000F                172      BTST.B D5,#15
-00001188  6600 000C                173      BNE _ES_1
-0000118C  08B8 0000 1042           174      BCLR.B #0,ESR
-00001192  6000 0008                175      BRA CERO_PUESTO3
-00001196                           176  _ES_1:
-00001196  08F8 0000 1042           177      BSET.B #0,ESR
-0000119C                           178  CERO_PUESTO3:
-0000119C                           179         
-0000119C                           180  ESUB:
-0000119C                           181  ENAN:
-0000119C                           182  ESTC:
-0000119C  3638 102E                183      MOVE.W EIR,D3
-000011A0  C67C 0F00                184      AND.W #$0F00,D3
-000011A4  E08B                     185      LSR.L #8,D3
-000011A6                           186  
-000011A6  4EB9 000011B4            187      JSR DECOD_VALOR
-000011AC                           188      ;en D4 esta el valor de bbb en decimal
-000011AC                           189      
-000011AC                           190      ;cojer constante k
-000011AC                           191      
-000011AC                           192      ;guardarlo en el registro indicado (D4 <--- [D5])
-000011AC                           193      
-000011AC                           194  
-000011AC                           195  EINC:
-000011AC                           196  ELOA:
-000011AC                           197  ELOAX:
-000011AC                           198  ESTO:
-000011AC                           199  ESTOX:
-000011AC                           200  EBRI:
-000011AC                           201  EBRZ:
-000011AC                           202  EBRN:
-000011AC                           203  ESTP:
-000011AC                           204         
-000011AC                           205      ;--- FEXEC: FIN EJECUCION
-000011AC                           206      
-000011AC  51C8 FE9A                207         DBRA D0,FETCH   ;bucle temporal
-000011B0                           208         
-000011B0  FFFF FFFF                209         SIMHALT  ;TEMPORAL
-000011B4                           210  
-000011B4                           211      ;--- ISUBR: INICIO SUBRUTINAS
-000011B4                           212          ;*** Aqui debeis incluir las subrutinas que necesite vuestra solucion
-000011B4                           213          ;*** SALVO DECOD, que va en la siguiente seccion
-000011B4                           214  DECOD_VALOR:
-000011B4  383C 0000                215      MOVE.W #0,D4
-000011B8                           216      
-000011B8  0803 0000                217      BTST #0,D3
-000011BC  6700 0004                218      BEQ CERO1
-000011C0  5244                     219      ADD.W #1,D4
-000011C2                           220      
-000011C2                           221  CERO1:
-000011C2  0803 0001                222      BTST #1,D3
-000011C6  6700 0004                223      BEQ CERO2
-000011CA  5444                     224      ADD.W #2,D4
-000011CC                           225      
-000011CC                           226  CERO2:   
-000011CC  0803 0002                227      BTST #2,D3
-000011D0  6700 0004                228      BEQ CERO3
-000011D4  5844                     229      ADD.W #4,D4
-000011D6                           230      
-000011D6                           231  CERO3:
-000011D6  4E75                     232      RTS
-000011D8                           233      
-000011D8                           234  COJER_CONTENIDO:
-000011D8                           235      ;coje el contenido de la posicion de memoria y lo almacena en D5
-000011D8                           236      
-000011D8  B87C 0000                237      CMP #0,D4 ;B0
-000011DC  6600 0006                238      BNE AUX0
-000011E0  3A38 1032                239      MOVE EB0,D5
-000011E4                           240      
-000011E4                           241  AUX0:
-000011E4  B87C 0001                242      CMP #1,D4 ;B1
-000011E8  6600 0006                243      BNE AUX1
-000011EC  3A38 1034                244      MOVE EB1,D5
-000011F0                           245      
-000011F0                           246  AUX1:    
-000011F0  B87C 0002                247      CMP #2,D4 ;R2
-000011F4  6600 0006                248      BNE AUX2
-000011F8  3A38 1036                249      MOVE ER2,D5
-000011FC                           250      
-000011FC                           251  AUX2:    
-000011FC  B87C 0003                252      CMP #3,D4 ;R3
-00001200  6600 0006                253      BNE AUX3
-00001204  3A38 1038                254      MOVE ER3,D5
-00001208                           255  
-00001208                           256  AUX3:    
-00001208  B87C 0004                257      CMP #4,D4 ;R4
-0000120C  6600 0006                258      BNE AUX4
-00001210  3A38 103A                259      MOVE ER4,D5
-00001214                           260  
-00001214                           261  AUX4:    
-00001214  B87C 0005                262      CMP #5,D4 ;R5
-00001218  6600 0006                263      BNE AUX5
-0000121C  3A38 103C                264      MOVE ER5,D5
-00001220                           265  
-00001220                           266  AUX5:    
-00001220  B87C 0006                267      CMP #6,D4 ;T6
-00001224  6600 0006                268      BNE AUX6
-00001228  3A38 103E                269      MOVE ET6,D5
-0000122C                           270      
-0000122C                           271  AUX6:   
-0000122C  B87C 0007                272      CMP #7,D4 ;T7
-00001230  6600 0006                273      BNE AUX7
-00001234  3A38 1040                274      MOVE ET7,D5
-00001238                           275      
-00001238                           276  AUX7:
-00001238  4E75                     277      RTS
-0000123A                           278      
-0000123A                           279  GUARDAR_CONTENIDO:
-0000123A                           280      ;guarda el contenido de D5 en la posicion indicada por D4
-0000123A                           281      
-0000123A  B87C 0000                282      CMP #0,D4 ;B0
-0000123E  6600 0006                283      BNE AUX0_
-00001242  31C5 1032                284      MOVE D5,EB0
-00001246                           285      
-00001246                           286  AUX0_:
-00001246  B87C 0001                287      CMP #1,D4 ;B1
-0000124A  6600 0006                288      BNE AUX1_
-0000124E  31C5 1034                289      MOVE D5,EB1
-00001252                           290      
-00001252                           291  AUX1_:    
-00001252  B87C 0002                292      CMP #2,D4 ;R2
-00001256  6600 0006                293      BNE AUX2_
-0000125A  31C5 1036                294      MOVE D5,ER2
-0000125E                           295      
-0000125E                           296  AUX2_:    
-0000125E  B87C 0003                297      CMP #3,D4 ;R3
-00001262  6600 0006                298      BNE AUX3_
-00001266  31C5 1038                299      MOVE D5,ER3
-0000126A                           300  
-0000126A                           301  AUX3_:    
-0000126A  B87C 0004                302      CMP #4,D4 ;R4
-0000126E  6600 0006                303      BNE AUX4_
-00001272  31C5 103A                304      MOVE D5,ER4
-00001276                           305  
-00001276                           306  AUX4_:    
-00001276  B87C 0005                307      CMP #5,D4 ;R5
-0000127A  6600 0006                308      BNE AUX5_
-0000127E  31C5 103C                309      MOVE D5,ER5
-00001282                           310  
-00001282                           311  AUX5_:    
-00001282  B87C 0006                312      CMP #6,D4 ;T6
-00001286  6600 0006                313      BNE AUX6_
-0000128A  31C5 103E                314      MOVE D5,ET6
-0000128E                           315      
-0000128E                           316  AUX6_:   
-0000128E  B87C 0007                317      CMP #7,D4 ;T7
-00001292  6600 0006                318      BNE AUX7_
-00001296  31C5 1040                319      MOVE D5,ET7
-0000129A                           320      
-0000129A                           321  AUX7_:
-0000129A                           322  
-0000129A                           323      
-0000129A  4E75                     324      RTS
-0000129C                           325      
-0000129C                           326  FLAG_C:
-0000129C  40C6                     327      MOVE.W SR,D6
-0000129E  0D3C 0000                328      BTST.B D6,#0
-000012A2                           329      
-000012A2                           330      
-000012A2                           331  
-000012A2                           332  
-000012A2  4E75                     333      RTS
-000012A4                           334  
-000012A4                           335          
-000012A4                           336      ;--- FSUBR: FIN SUBRUTINAS
-000012A4                           337      
-000012A4                           338  
-000012A4                           339      ;--- IDECOD: INICIO DECOD
-000012A4                           340          ;*** Tras la etiqueta DECOD, debeis implementar la subrutina de 
-000012A4                           341          ;*** decodificacion, que debera ser de libreria, siguiendo la interfaz
-000012A4                           342          ;*** especificada en el enunciado
-000012A4                           343  DECOD:
-000012A4                           344  ;guardar registros en la pila
-000012A4                           345  
-000012A4  3F00                     346         MOVE.W D0,-(SP)
-000012A6  3F02                     347         MOVE.W D2,-(SP)
-000012A8                           348         
-000012A8  342F 0008                349         MOVE.W 8(SP),D2
-000012AC                           350         
-000012AC  0802 000F                351         BTST.L #15,D2
-000012B0  6600 00C2                352         BNE BIT15_1   
-000012B4                           353         
-000012B4                           354  ;Inicio rama 0x
-000012B4  0802 000E                355         BTST.L #14,D2
-000012B8  6600 0072                356         BNE R0BIT14_1
-000012BC                           357         
-000012BC                           358        
-000012BC  0802 000D                359         BTST.L #13,D2
-000012C0  6600 0016                360         BNE R02BIT13_1
-000012C4                           361         
-000012C4                           362        
-000012C4  0802 000C                363         BTST.L #12,D2
-000012C8  6600 0042                364         BNE R02BIT12_1 
-000012CC                           365         
-000012CC                           366        
-000012CC  3F7C 0000 000A           367         MOVE.W #0,10(SP)  ;instruccion num TRA
-000012D2  4EF9 000013BC            368         JMP END_DEC
-000012D8                           369         
-000012D8                           370  R02BIT13_1:
-000012D8  0802 000C                371         BTST.L #12,D2
-000012DC  6600 0022                372         BNE R022BIT12_1
-000012E0                           373        
-000012E0  0802 000B                374         BTST.L #11,D2
-000012E4  6600 000E                375         BNE R02BIT11_1
-000012E8                           376        
-000012E8  3F7C 0003 000A           377         MOVE.W #3,10(SP)  ;instruccion num NAN
-000012EE  4EF9 000013BC            378         JMP END_DEC
-000012F4                           379  
-000012F4                           380   
-000012F4                           381  R02BIT11_1:
-000012F4  3F7C 0004 000A           382         MOVE.W #4,10(SP)  ;instruccion num STC
-000012FA  4EF9 000013BC            383         JMP END_DEC
-00001300                           384         
-00001300                           385  R022BIT12_1:
-00001300  3F7C 0005 000A           386         MOVE.W #5,10(SP)  ;instruccion num INC
-00001306  4EF9 000013BC            387         JMP END_DEC
-0000130C                           388  
-0000130C                           389  R02BIT12_1: 
-0000130C  0802 000B                390         BTST.L #11,D2
-00001310  6600 000E                391         BNE R022BIT11_1
-00001314                           392        
-00001314  3F7C 0001 000A           393         MOVE.W #1,10(SP)  ;instruccion num ADD
-0000131A  4EF9 000013BC            394         JMP END_DEC
-00001320                           395         
-00001320                           396  R022BIT11_1:
-00001320  3F7C 0002 000A           397         MOVE.W #2,10(SP)  ;instruccion num SUB
-00001326  4EF9 000013BC            398         JMP END_DEC      
-0000132C                           399  
-0000132C                           400        
-0000132C                           401        
-0000132C                           402        ;si bit 14 = 1
-0000132C                           403  R0BIT14_1:
-0000132C  0802 000D                404         BTST.L #13,D2
-00001330  6600 0016                405         BNE R0BIT13_1
-00001334                           406         
-00001334  0802 000C                407         BTST.L #12,D2
-00001338  6600 0022                408         BNE R0_1_BIT12_1
-0000133C                           409         
-0000133C  3F7C 0006 000A           410         MOVE.W #6,10(SP)  ;instrucciónn num LOA M
-00001342  4EF9 000013BC            411         JMP END_DEC
-00001348                           412         
-00001348                           413  R0BIT13_1:
-00001348  0802 000C                414         BTST.L #12,D2
-0000134C  6600 001A                415         BNE R0_2_BIT12_1
-00001350  3F7C 0008 000A           416         MOVE.W #8,10(SP)   ;instruccion num STOM
-00001356  4EF9 000013BC            417         JMP END_DEC
-0000135C                           418  
-0000135C                           419  R0_1_BIT12_1:
-0000135C  3F7C 0007 000A           420         MOVE.W #7,10(SP) ;instruccion num LOAX
-00001362  4EF9 000013BC            421         JMP END_DEC
-00001368                           422         
-00001368                           423  R0_2_BIT12_1:
-00001368  3F7C 0009 000A           424         MOVE.W #9,10(SP) ;instruccion num STOX
-0000136E  4EF9 000013BC            425         JMP END_DEC
-00001374                           426         
-00001374                           427    
-00001374                           428  
-00001374                           429  
-00001374                           430       
-00001374                           431  ;Inicio rama 1x 
-00001374                           432  BIT15_1:
-00001374  0802 000E                433         BTST.L #14,D2
-00001378  6600 001E                434         BNE R1BIT14_1
-0000137C                           435         
-0000137C  0802 000D                436         BTST.L #13,D2
-00001380  6600 0022                437         BNE R1BIT13_1
-00001384                           438         
-00001384  0802 000C                439         BTST.L #12,D2
-00001388  6600 0026                440         BNE R1BIT12_1
-0000138C                           441         
-0000138C  3F7C 000A 000A           442         MOVE.W #10,10(SP) ;instrucción  num BRI M
-00001392  4EF9 000013BC            443         JMP END_DEC
-00001398                           444         
-00001398                           445      
-00001398                           446  R1BIT14_1:
-00001398  3F7C 000D 000A           447         MOVE.W #13,10(SP) ;instrucción num STP
-0000139E  4EF9 000013BC            448         JMP END_DEC
-000013A4                           449                                       
-000013A4                           450  R1BIT13_1:
-000013A4  3F7C 000C 000A           451         MOVE.W #12,10(SP) ;instruccin num BRN M
-000013AA  4EF9 000013BC            452         JMP END_DEC
-000013B0                           453  
-000013B0                           454  R1BIT12_1:
-000013B0                           455        
-000013B0  3F7C 000B 000A           456        MOVE.W #11,10(SP) ;instruccion num BRZ M
-000013B6  4EF9 000013BC            457        JMP END_DEC
-000013BC                           458        
-000013BC                           459  
-000013BC                           460  END_DEC:
-000013BC                           461  
-000013BC                           462  ;devolver los valores a los registros desde la pila
-000013BC  341F                     463        MOVE.W (SP)+,D2
-000013BE  301F                     464        MOVE.W (SP)+,D0
-000013C0                           465  
-000013C0                           466        
-000013C0  4E75                     467        RTS
-000013C2                           468        
-000013C2                           469      ;--- FDECOD: FIN DECOD
-000013C2                           470      END    START
+00001100                           114      ;limpiar los registros usados
+00001100  4243                     115      CLR.W D3
+00001102  4244                     116      CLR.W D4
+00001104  4245                     117      CLR.W D5    
+00001106                           118      
+00001106  4EF8 1048                119      JMP FETCH
+0000110A                           120  EADD:
+0000110A                           121      ;mover aaa a la posicion menos significativa
+0000110A  3638 102E                122      MOVE.W EIR,D3
+0000110E  C67C 00F0                123      AND.W #$00F0,D3
+00001112  E88B                     124      LSR.L #4,D3
+00001114                           125  
+00001114  4EB9 000011FC            126      JSR DECOD_VALOR
+0000111A                           127      ;en D4 esta el valor de aaa en decimal
+0000111A  4EB9 00001220            128      JSR COJER_CONTENIDO
+00001120                           129      ;en D5 esta el contenido de el eregistro Xa
+00001120  3A06                     130      MOVE.W D6,D5
+00001122                           131      
+00001122                           132      ;mirar el operando b
+00001122  3638 102E                133      MOVE.W EIR,D3
+00001126  C67C 0F00                134      AND.W #$0F00,D3
+0000112A  E08B                     135      LSR.L #8,D3
+0000112C                           136      
+0000112C  4EB9 000011FC            137      JSR DECOD_VALOR
+00001132                           138      ;en D4 esta el valor de bbb en decimal
+00001132  4EB9 00001220            139      JSR COJER_CONTENIDO
+00001138                           140      ;en D5 esta el contenido de bbb
+00001138                           141      
+00001138  DC45                     142      ADD.W D5,D6
+0000113A                           143      ;resultado suma en D5
+0000113A  40C7                     144      MOVE.W SR,D7
+0000113C                           145      ;guardar flags de la operación
+0000113C                           146      
+0000113C  4EB9 00001282            147      JSR GUARDAR_CONTENIDO
+00001142                           148      ;D4 es bbb, guardar contenido ahi
+00001142                           149      
+00001142                           150      ;actualizar flags Z,N (con lo que hay en D5)
+00001142  4EB9 000012E4            151      JSR ACT_FLAGS
+00001148                           152      ;actualizar flag C
+00001148  4EB9 00001316            153      JSR ACT_FLAG_C
+0000114E                           154      
+0000114E                           155      ;limpiar registros
+0000114E  4243                     156      CLR.W D3
+00001150  4244                     157      CLR.W D4
+00001152  4245                     158      CLR.W D5
+00001154  4246                     159      CLR.W D6
+00001156                           160      
+00001156  4EF8 1048                161      JMP FETCH
+0000115A                           162  ESUB:
+0000115A  4EF8 1048                163      JMP FETCH
+0000115E                           164  ENAN:
+0000115E  4EF8 1048                165      JMP FETCH
+00001162                           166  ESTC:
+00001162  3638 102E                167      MOVE.W EIR,D3
+00001166  C67C 0F00                168      AND.W #$0F00,D3
+0000116A  E08B                     169      LSR.L #8,D3
+0000116C  4EB9 000011FC            170      JSR DECOD_VALOR
+00001172                           171      ;en D4 esta el valor de bbb en decimal
+00001172                           172      
+00001172                           173      ;cojer constante k
+00001172  3638 102E                174      MOVE.W EIR,D3
+00001176  C67C 00FF                175      AND.W #$00FF,D3
+0000117A  4883                     176      EXT.W D3
+0000117C  48C3                     177      EXT.L D3
+0000117E  3A03                     178      MOVE.W D3,D5
+00001180                           179      ;guardarlo en el registro indicado (D4 <--- [D5])
+00001180                           180      ;actualizar flags N y Z
+00001180  4EB9 000012E4            181      JSR ACT_FLAGS
+00001186                           182      
+00001186  4EB9 00001282            183      JSR GUARDAR_CONTENIDO
+0000118C                           184      
+0000118C  4243                     185      CLR.W D3
+0000118E  4244                     186      CLR.W D4
+00001190  4245                     187      CLR.W D5
+00001192                           188      
+00001192  4EF8 1048                189      JMP FETCH
+00001196                           190  
+00001196                           191  EINC:;revisar
+00001196                           192      ;cojer constante k
+00001196  3638 102E                193      MOVE.W EIR,D3
+0000119A  C67C 00FF                194      AND.W #$00FF,D3
+0000119E  4883                     195      EXT.W D3
+000011A0  48C3                     196      EXT.L D3
+000011A2  3C03                     197      MOVE.W D3,D6
+000011A4                           198      
+000011A4  3638 102E                199      MOVE.W EIR,D3
+000011A8  C67C 0F00                200      AND.W #$0F00,D3
+000011AC  E08B                     201      LSR.L #8,D3
+000011AE  4EB9 000011FC            202      JSR DECOD_VALOR
+000011B4                           203      ;en D4 esta el valor de bbb en decimal
+000011B4                           204      
+000011B4  4EB9 00001220            205      JSR COJER_CONTENIDO
+000011BA                           206      ;en D5 contenido de bbb
+000011BA                           207      
+000011BA  DC45                     208      ADD.W D5,D6
+000011BC                           209      
+000011BC                           210      ;actualizar flags N,Z y C
+000011BC  40C7                     211      MOVE.W SR,D7
+000011BE  4EB9 000012E4            212      JSR ACT_FLAGS
+000011C4  4EB9 00001316            213      JSR ACT_FLAG_C
+000011CA                           214      
+000011CA  4EB9 00001282            215      JSR GUARDAR_CONTENIDO
+000011D0                           216      ;guarda la suma en el eregistro correspondiente
+000011D0                           217      
+000011D0  4243                     218      CLR.W D3
+000011D2  4244                     219      CLR.W D4
+000011D4  4245                     220      CLR.W D5
+000011D6  4246                     221      CLR.W D6
+000011D8                           222   
+000011D8  4EF8 1048                223      JMP FETCH
+000011DC                           224       
+000011DC                           225  ELOA:
+000011DC  4EF8 1048                226      JMP FETCH
+000011E0                           227  ELOAX:
+000011E0  4EF8 1048                228      JMP FETCH
+000011E4                           229  ESTO:
+000011E4  4EF8 1048                230      JMP FETCH
+000011E8                           231  ESTOX:
+000011E8  4EF8 1048                232      JMP FETCH
+000011EC                           233  EBRI:
+000011EC  4EF8 1048                234      JMP FETCH
+000011F0                           235  EBRZ:
+000011F0  4EF8 1048                236      JMP FETCH
+000011F4                           237  EBRN:
+000011F4  4EF8 1048                238      JMP FETCH
+000011F8                           239  ESTP:
+000011F8  FFFF FFFF                240      SIMHALT   
+000011FC                           241      ;--- FEXEC: FIN EJECUCION
+000011FC                           242  
+000011FC                           243      ;--- ISUBR: INICIO SUBRUTINAS
+000011FC                           244          ;*** Aqui debeis incluir las subrutinas que necesite vuestra solucion
+000011FC                           245          ;*** SALVO DECOD, que va en la siguiente seccion
+000011FC                           246  DECOD_VALOR:
+000011FC  383C 0000                247      MOVE.W #0,D4
+00001200                           248      
+00001200  0803 0000                249      BTST #0,D3
+00001204  6700 0004                250      BEQ CERO1
+00001208  5244                     251      ADD.W #1,D4
+0000120A                           252      
+0000120A                           253  CERO1:
+0000120A  0803 0001                254      BTST #1,D3
+0000120E  6700 0004                255      BEQ CERO2
+00001212  5444                     256      ADD.W #2,D4
+00001214                           257      
+00001214                           258  CERO2:   
+00001214  0803 0002                259      BTST #2,D3
+00001218  6700 0004                260      BEQ CERO3
+0000121C  5844                     261      ADD.W #4,D4
+0000121E                           262      
+0000121E                           263  CERO3:
+0000121E  4E75                     264      RTS
+00001220                           265      
+00001220                           266  COJER_CONTENIDO:
+00001220                           267      ;coje el contenido de la posicion de memoria y lo almacena en D5
+00001220                           268      
+00001220  B87C 0000                269      CMP #0,D4 ;B0
+00001224  6600 0006                270      BNE AUX0
+00001228  3A38 1032                271      MOVE EB0,D5
+0000122C                           272      
+0000122C                           273  AUX0:
+0000122C  B87C 0001                274      CMP #1,D4 ;B1
+00001230  6600 0006                275      BNE AUX1
+00001234  3A38 1034                276      MOVE EB1,D5
+00001238                           277      
+00001238                           278  AUX1:    
+00001238  B87C 0002                279      CMP #2,D4 ;R2
+0000123C  6600 0006                280      BNE AUX2
+00001240  3A38 1036                281      MOVE ER2,D5
+00001244                           282      
+00001244                           283  AUX2:    
+00001244  B87C 0003                284      CMP #3,D4 ;R3
+00001248  6600 0006                285      BNE AUX3
+0000124C  3A38 1038                286      MOVE ER3,D5
+00001250                           287  
+00001250                           288  AUX3:    
+00001250  B87C 0004                289      CMP #4,D4 ;R4
+00001254  6600 0006                290      BNE AUX4
+00001258  3A38 103A                291      MOVE ER4,D5
+0000125C                           292  
+0000125C                           293  AUX4:    
+0000125C  B87C 0005                294      CMP #5,D4 ;R5
+00001260  6600 0006                295      BNE AUX5
+00001264  3A38 103C                296      MOVE ER5,D5
+00001268                           297  
+00001268                           298  AUX5:    
+00001268  B87C 0006                299      CMP #6,D4 ;T6
+0000126C  6600 0006                300      BNE AUX6
+00001270  3A38 103E                301      MOVE ET6,D5
+00001274                           302      
+00001274                           303  AUX6:   
+00001274  B87C 0007                304      CMP #7,D4 ;T7
+00001278  6600 0006                305      BNE AUX7
+0000127C  3A38 1040                306      MOVE ET7,D5
+00001280                           307      
+00001280                           308  AUX7:
+00001280  4E75                     309      RTS
+00001282                           310      
+00001282                           311  GUARDAR_CONTENIDO:
+00001282                           312      ;guarda el contenido de D5 en la posicion indicada por D4
+00001282                           313      
+00001282  B87C 0000                314      CMP #0,D4 ;B0
+00001286  6600 0006                315      BNE AUX0_
+0000128A  31C5 1032                316      MOVE D5,EB0
+0000128E                           317      
+0000128E                           318  AUX0_:
+0000128E  B87C 0001                319      CMP #1,D4 ;B1
+00001292  6600 0006                320      BNE AUX1_
+00001296  31C5 1034                321      MOVE D5,EB1
+0000129A                           322      
+0000129A                           323  AUX1_:    
+0000129A  B87C 0002                324      CMP #2,D4 ;R2
+0000129E  6600 0006                325      BNE AUX2_
+000012A2  31C5 1036                326      MOVE D5,ER2
+000012A6                           327      
+000012A6                           328  AUX2_:    
+000012A6  B87C 0003                329      CMP #3,D4 ;R3
+000012AA  6600 0006                330      BNE AUX3_
+000012AE  31C5 1038                331      MOVE D5,ER3
+000012B2                           332  
+000012B2                           333  AUX3_:    
+000012B2  B87C 0004                334      CMP #4,D4 ;R4
+000012B6  6600 0006                335      BNE AUX4_
+000012BA  31C5 103A                336      MOVE D5,ER4
+000012BE                           337  
+000012BE                           338  AUX4_:    
+000012BE  B87C 0005                339      CMP #5,D4 ;R5
+000012C2  6600 0006                340      BNE AUX5_
+000012C6  31C5 103C                341      MOVE D5,ER5
+000012CA                           342  
+000012CA                           343  AUX5_:    
+000012CA  B87C 0006                344      CMP #6,D4 ;T6
+000012CE  6600 0006                345      BNE AUX6_
+000012D2  31C5 103E                346      MOVE D5,ET6
+000012D6                           347      
+000012D6                           348  AUX6_:   
+000012D6  B87C 0007                349      CMP #7,D4 ;T7
+000012DA  6600 0006                350      BNE AUX7_
+000012DE  31C5 1040                351      MOVE D5,ET7
+000012E2                           352      
+000012E2                           353  AUX7_:
+000012E2                           354  
+000012E2  4E75                     355      RTS
+000012E4                           356  
+000012E4                           357  ;Actualización de flags Z y N (Dato en D5)
+000012E4                           358  ACT_FLAGS:
+000012E4  3F06                     359      MOVE.W D6,-(SP)
+000012E6                           360      
+000012E6  3C38 1042                361      MOVE.W ESR,D6
+000012EA                           362      
+000012EA  BA7C 0000                363      CMP #0,D5
+000012EE  6600 000A                364      BNE _CERO
+000012F2  08C6 0002                365      BSET #2,D6
+000012F6  6000 0006                366      BRA UNO_PUESTO
+000012FA                           367  _CERO:
+000012FA  0886 0002                368      BCLR #2,D6
+000012FE                           369  UNO_PUESTO:
+000012FE                           370      
+000012FE  0B3C 000F                371      BTST D5,#15
+00001302  6600 000A                372      BNE ES_0
+00001306  08C6 0000                373      BSET #0,D6
+0000130A  6000 0006                374      BRA UNO_PUESTO1
+0000130E                           375  ES_0:
+0000130E  0886 0000                376      BCLR #0,D6
+00001312                           377  UNO_PUESTO1:
+00001312                           378  
+00001312  3C1F                     379      MOVE.W (SP)+,D6
+00001314  4E75                     380      RTS
+00001316                           381      
+00001316                           382  ;actualizar flag C  
+00001316                           383  ACT_FLAG_C:
+00001316  3F06                     384      MOVE.W D6,-(SP)
+00001318  3C38 1042                385      MOVE.W ESR,D6
+0000131C                           386  
+0000131C  0F3C 0000                387      BTST D7,#0
+00001320  6600 000A                388      BNE ES_CERO
+00001324  08C6 0001                389      BSET #1,D6
+00001328  31C6 1042                390      MOVE.W D6,ESR
+0000132C                           391       
+0000132C                           392  ES_CERO:
+0000132C  3C1F                     393      MOVE.W (SP)+,D6    
+0000132E                           394      
+0000132E  4E75                     395      RTS
+00001330                           396  
+00001330                           397          
+00001330                           398      ;--- FSUBR: FIN SUBRUTINAS
+00001330                           399      
+00001330                           400  
+00001330                           401      ;--- IDECOD: INICIO DECOD
+00001330                           402          ;*** Tras la etiqueta DECOD, debeis implementar la subrutina de 
+00001330                           403          ;*** decodificacion, que debera ser de libreria, siguiendo la interfaz
+00001330                           404          ;*** especificada en el enunciado
+00001330                           405  DECOD:
+00001330                           406  ;guardar registros en la pila
+00001330                           407  
+00001330  3F00                     408         MOVE.W D0,-(SP)
+00001332  3F02                     409         MOVE.W D2,-(SP)
+00001334                           410         
+00001334  342F 0008                411         MOVE.W 8(SP),D2
+00001338                           412         
+00001338  0802 000F                413         BTST.L #15,D2
+0000133C  6600 00C2                414         BNE BIT15_1   
+00001340                           415         
+00001340                           416  ;Inicio rama 0x
+00001340  0802 000E                417         BTST.L #14,D2
+00001344  6600 0072                418         BNE R0BIT14_1
+00001348                           419         
+00001348                           420        
+00001348  0802 000D                421         BTST.L #13,D2
+0000134C  6600 0016                422         BNE R02BIT13_1
+00001350                           423         
+00001350                           424        
+00001350  0802 000C                425         BTST.L #12,D2
+00001354  6600 0042                426         BNE R02BIT12_1 
+00001358                           427         
+00001358                           428        
+00001358  3F7C 0000 000A           429         MOVE.W #0,10(SP)  ;instruccion num TRA
+0000135E  4EF9 00001448            430         JMP END_DEC
+00001364                           431         
+00001364                           432  R02BIT13_1:
+00001364  0802 000C                433         BTST.L #12,D2
+00001368  6600 0022                434         BNE R022BIT12_1
+0000136C                           435        
+0000136C  0802 000B                436         BTST.L #11,D2
+00001370  6600 000E                437         BNE R02BIT11_1
+00001374                           438        
+00001374  3F7C 0003 000A           439         MOVE.W #3,10(SP)  ;instruccion num NAN
+0000137A  4EF9 00001448            440         JMP END_DEC
+00001380                           441  
+00001380                           442   
+00001380                           443  R02BIT11_1:
+00001380  3F7C 0004 000A           444         MOVE.W #4,10(SP)  ;instruccion num STC
+00001386  4EF9 00001448            445         JMP END_DEC
+0000138C                           446         
+0000138C                           447  R022BIT12_1:
+0000138C  3F7C 0005 000A           448         MOVE.W #5,10(SP)  ;instruccion num INC
+00001392  4EF9 00001448            449         JMP END_DEC
+00001398                           450  
+00001398                           451  R02BIT12_1: 
+00001398  0802 000B                452         BTST.L #11,D2
+0000139C  6600 000E                453         BNE R022BIT11_1
+000013A0                           454        
+000013A0  3F7C 0001 000A           455         MOVE.W #1,10(SP)  ;instruccion num ADD
+000013A6  4EF9 00001448            456         JMP END_DEC
+000013AC                           457         
+000013AC                           458  R022BIT11_1:
+000013AC  3F7C 0002 000A           459         MOVE.W #2,10(SP)  ;instruccion num SUB
+000013B2  4EF9 00001448            460         JMP END_DEC      
+000013B8                           461  
+000013B8                           462        
+000013B8                           463        
+000013B8                           464        ;si bit 14 = 1
+000013B8                           465  R0BIT14_1:
+000013B8  0802 000D                466         BTST.L #13,D2
+000013BC  6600 0016                467         BNE R0BIT13_1
+000013C0                           468         
+000013C0  0802 000C                469         BTST.L #12,D2
+000013C4  6600 0022                470         BNE R0_1_BIT12_1
+000013C8                           471         
+000013C8  3F7C 0006 000A           472         MOVE.W #6,10(SP)  ;instrucciónn num LOA M
+000013CE  4EF9 00001448            473         JMP END_DEC
+000013D4                           474         
+000013D4                           475  R0BIT13_1:
+000013D4  0802 000C                476         BTST.L #12,D2
+000013D8  6600 001A                477         BNE R0_2_BIT12_1
+000013DC  3F7C 0008 000A           478         MOVE.W #8,10(SP)   ;instruccion num STOM
+000013E2  4EF9 00001448            479         JMP END_DEC
+000013E8                           480  
+000013E8                           481  R0_1_BIT12_1:
+000013E8  3F7C 0007 000A           482         MOVE.W #7,10(SP) ;instruccion num LOAX
+000013EE  4EF9 00001448            483         JMP END_DEC
+000013F4                           484         
+000013F4                           485  R0_2_BIT12_1:
+000013F4  3F7C 0009 000A           486         MOVE.W #9,10(SP) ;instruccion num STOX
+000013FA  4EF9 00001448            487         JMP END_DEC
+00001400                           488         
+00001400                           489    
+00001400                           490  
+00001400                           491  
+00001400                           492       
+00001400                           493  ;Inicio rama 1x 
+00001400                           494  BIT15_1:
+00001400  0802 000E                495         BTST.L #14,D2
+00001404  6600 001E                496         BNE R1BIT14_1
+00001408                           497         
+00001408  0802 000D                498         BTST.L #13,D2
+0000140C  6600 0022                499         BNE R1BIT13_1
+00001410                           500         
+00001410  0802 000C                501         BTST.L #12,D2
+00001414  6600 0026                502         BNE R1BIT12_1
+00001418                           503         
+00001418  3F7C 000A 000A           504         MOVE.W #10,10(SP) ;instrucción  num BRI M
+0000141E  4EF9 00001448            505         JMP END_DEC
+00001424                           506         
+00001424                           507      
+00001424                           508  R1BIT14_1:
+00001424  3F7C 000D 000A           509         MOVE.W #13,10(SP) ;instrucción num STP
+0000142A  4EF9 00001448            510         JMP END_DEC
+00001430                           511                                       
+00001430                           512  R1BIT13_1:
+00001430  3F7C 000C 000A           513         MOVE.W #12,10(SP) ;instruccin num BRN M
+00001436  4EF9 00001448            514         JMP END_DEC
+0000143C                           515  
+0000143C                           516  R1BIT12_1:
+0000143C                           517        
+0000143C  3F7C 000B 000A           518        MOVE.W #11,10(SP) ;instruccion num BRZ M
+00001442  4EF9 00001448            519        JMP END_DEC
+00001448                           520        
+00001448                           521  
+00001448                           522  END_DEC:
+00001448                           523  
+00001448                           524  ;devolver los valores a los registros desde la pila
+00001448  341F                     525        MOVE.W (SP)+,D2
+0000144A  301F                     526        MOVE.W (SP)+,D0
+0000144C                           527  
+0000144C                           528        
+0000144C  4E75                     529        RTS
+0000144E                           530        
+0000144E                           531      ;--- FDECOD: FIN DECOD
+0000144E                           532      END    START
 
 No errors detected
 No warnings generated
@@ -480,78 +542,76 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-AUX0                11E4
-AUX0_               1246
-AUX1                11F0
-AUX1_               1252
-AUX2                11FC
-AUX2_               125E
-AUX3                1208
-AUX3_               126A
-AUX4                1214
-AUX4_               1276
-AUX5                1220
-AUX5_               1282
-AUX6                122C
-AUX6_               128E
-AUX7                1238
-AUX7_               129A
-BIT15_1             1374
-CERO1               11C2
-CERO2               11CC
-CERO3               11D6
-CERO_PUESTO         1118
-CERO_PUESTO1        1130
-CERO_PUESTO2        1184
-CERO_PUESTO3        119C
-COJER_CONTENIDO     11D8
-DECOD               12A4
-DECOD_VALOR         11B4
-EADD                1136
+ACT_FLAGS           12E4
+ACT_FLAG_C          1316
+AUX0                122C
+AUX0_               128E
+AUX1                1238
+AUX1_               129A
+AUX2                1244
+AUX2_               12A6
+AUX3                1250
+AUX3_               12B2
+AUX4                125C
+AUX4_               12BE
+AUX5                1268
+AUX5_               12CA
+AUX6                1274
+AUX6_               12D6
+AUX7                1280
+AUX7_               12E2
+BIT15_1             1400
+CERO1               120A
+CERO2               1214
+CERO3               121E
+COJER_CONTENIDO     1220
+DECOD               1330
+DECOD_VALOR         11FC
+EADD                110A
 EB0                 1032
 EB1                 1034
-EBRI                11AC
-EBRN                11AC
-EBRZ                11AC
-EINC                11AC
+EBRI                11EC
+EBRN                11F4
+EBRZ                11F0
+EINC                1196
 EIR                 102E
-ELOA                11AC
-ELOAX               11AC
+ELOA                11DC
+ELOAX               11E0
 EMEM                1000
-ENAN                119C
-END_DEC             13BC
+ENAN                115E
+END_DEC             1448
 EPC                 1030
 ER2                 1036
 ER3                 1038
 ER4                 103A
 ER5                 103C
 ESR                 1042
-ESTC                119C
-ESTO                11AC
-ESTOX               11AC
-ESTP                11AC
-ESUB                119C
-ES_1                112A
+ESTC                1162
+ESTO                11E4
+ESTOX               11E8
+ESTP                11F8
+ESUB                115A
+ES_0                130E
+ES_CERO             132C
 ET6                 103E
 ET7                 1040
-ETRA                10D4
+ETRA                10CE
 FETCH               1048
-FLAG_C              129C
-GUARDAR_CONTENIDO   123A
-JMPLIST             1080
-NO_CERO             1112
-R022BIT11_1         1320
-R022BIT12_1         1300
-R02BIT11_1          12F4
-R02BIT12_1          130C
-R02BIT13_1          12D8
-R0BIT13_1           1348
-R0BIT14_1           132C
-R0_1_BIT12_1        135C
-R0_2_BIT12_1        1368
-R1BIT12_1           13B0
-R1BIT13_1           13A4
-R1BIT14_1           1398
+GUARDAR_CONTENIDO   1282
+JMPLIST             107A
+R022BIT11_1         13AC
+R022BIT12_1         138C
+R02BIT11_1          1380
+R02BIT12_1          1398
+R02BIT13_1          1364
+R0BIT13_1           13D4
+R0BIT14_1           13B8
+R0_1_BIT12_1        13E8
+R0_2_BIT12_1        13F4
+R1BIT12_1           143C
+R1BIT13_1           1430
+R1BIT14_1           1424
 START               1044
-_ES_1               1196
-_NO_CERO            117E
+UNO_PUESTO          12FE
+UNO_PUESTO1         1312
+_CERO               12FA

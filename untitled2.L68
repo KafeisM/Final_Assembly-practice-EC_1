@@ -1,0 +1,265 @@
+00001014 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 23/05/2022 20:54:38
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Pruebas 
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG    $1000
+00001000= 32FF                       8  EMEM:   DC.W $32FF
+00001002= 0000                       9  EB0:    DC.W 0 ;eregistro B0
+00001004= 0000                      10  EB1:    DC.W 0 ;eregistro B1
+00001006= 0000                      11  ER2:    DC.W 0 ;eregistro R2
+00001008= 0000                      12  ER3:    DC.W 0 ;eregistro R3
+0000100A= 0000                      13  ER4:    DC.W 0 ;eregistro R4
+0000100C= 0000                      14  ER5:    DC.W 0 ;eregistro R5
+0000100E= 0000                      15  ET6:    DC.W 0 ;eregistro T6
+00001010= 0000                      16  ET7:    DC.W 0 ;eregistro T7
+00001012= 0000                      17  ESR:    DC.W 0 ;eregistro de estado (00000000 00000ZCN)
+00001014                            18  
+00001014                            19  
+00001014                            20  START:    
+00001014                            21      
+00001014  31FC 0003 1006            22      MOVE.W #3,ER2
+0000101A                            23      
+0000101A                            24     ;cojer constante k
+0000101A  3638 1000                 25      MOVE.W EMEM,D3
+0000101E  C67C 00FF                 26      AND.W #$00FF,D3
+00001022  4883                      27      EXT.W D3
+00001024  48C3                      28      EXT.L D3
+00001026  3C03                      29      MOVE.W D3,D6
+00001028                            30      
+00001028  3638 1000                 31      MOVE.W EMEM,D3
+0000102C  C67C 0F00                 32      AND.W #$0F00,D3
+00001030  E08B                      33      LSR.L #8,D3
+00001032  4EB9 0000105E             34      JSR DECOD_VALOR
+00001038                            35      ;en D4 esta el valor de bbb en decimal
+00001038                            36      
+00001038  4EB9 000010E4             37      JSR COJER_CONTENIDO
+0000103E                            38      ;en D5 contenido de bbb
+0000103E                            39      
+0000103E  DA46                      40      ADD.W D6,D5
+00001040                            41      
+00001040                            42      ;actualizar flags N,Z y C
+00001040  4EB9 00001146             43      JSR ACT_FLAGS
+00001046  4EB9 00001178             44      JSR ACT_FLAG_C
+0000104C                            45      
+0000104C  4EB9 00001082             46      JSR GUARDAR_CONTENIDO
+00001052                            47      ;guarda la suma en el eregistro correspondiente
+00001052                            48      
+00001052  4243                      49      CLR.W D3
+00001054  4244                      50      CLR.W D4
+00001056  4245                      51      CLR.W D5
+00001058  4246                      52      CLR.W D6
+0000105A                            53   
+0000105A  FFFF FFFF                 54      SIMHALT        
+0000105E                            55  
+0000105E                            56  DECOD_VALOR:
+0000105E  383C 0000                 57      MOVE.W #0,D4
+00001062                            58      
+00001062  0803 0000                 59      BTST #0,D3
+00001066  6700 0004                 60      BEQ CERO1
+0000106A  5244                      61      ADD.W #1,D4
+0000106C                            62      
+0000106C                            63  CERO1:
+0000106C  0803 0001                 64      BTST #1,D3
+00001070  6700 0004                 65      BEQ CERO2
+00001074  5444                      66      ADD.W #2,D4
+00001076                            67      
+00001076                            68  CERO2:   
+00001076  0803 0002                 69      BTST #2,D3
+0000107A  6700 0004                 70      BEQ CERO3
+0000107E  5844                      71      ADD.W #4,D4
+00001080                            72      
+00001080                            73  CERO3:
+00001080  4E75                      74      RTS
+00001082                            75      
+00001082                            76  GUARDAR_CONTENIDO:
+00001082                            77      ;guarda el contenido de D5 en la posicion indicada por D4
+00001082                            78      
+00001082  B87C 0000                 79      CMP #0,D4 ;B0
+00001086  6600 0006                 80      BNE AUX0_
+0000108A  31C5 1002                 81      MOVE D5,EB0
+0000108E                            82      
+0000108E                            83  AUX0_:
+0000108E  B87C 0001                 84      CMP #1,D4 ;B1
+00001092  6600 0006                 85      BNE AUX1_
+00001096  31C5 1004                 86      MOVE D5,EB1
+0000109A                            87      
+0000109A                            88  AUX1_:    
+0000109A  B87C 0002                 89      CMP #2,D4 ;R2
+0000109E  6600 0006                 90      BNE AUX2_
+000010A2  31C5 1006                 91      MOVE D5,ER2
+000010A6                            92      
+000010A6                            93  AUX2_:    
+000010A6  B87C 0003                 94      CMP #3,D4 ;R3
+000010AA  6600 0006                 95      BNE AUX3_
+000010AE  31C5 1008                 96      MOVE D5,ER3
+000010B2                            97  
+000010B2                            98  AUX3_:    
+000010B2  B87C 0004                 99      CMP #4,D4 ;R4
+000010B6  6600 0006                100      BNE AUX4_
+000010BA  31C5 100A                101      MOVE D5,ER4
+000010BE                           102  
+000010BE                           103  AUX4_:    
+000010BE  B87C 0005                104      CMP #5,D4 ;R5
+000010C2  6600 0006                105      BNE AUX5_
+000010C6  31C5 100C                106      MOVE D5,ER5
+000010CA                           107  
+000010CA                           108  AUX5_:    
+000010CA  B87C 0006                109      CMP #6,D4 ;T6
+000010CE  6600 0006                110      BNE AUX6_
+000010D2  31C5 100E                111      MOVE D5,ET6
+000010D6                           112      
+000010D6                           113  AUX6_:   
+000010D6  B87C 0007                114      CMP #7,D4 ;T7
+000010DA  6600 0006                115      BNE AUX7_
+000010DE  31C5 1010                116      MOVE D5,ET7
+000010E2                           117      
+000010E2                           118  AUX7_:
+000010E2                           119  
+000010E2  4E75                     120      RTS
+000010E4                           121  
+000010E4                           122      
+000010E4                           123  COJER_CONTENIDO:
+000010E4                           124      ;coje el contenido de la posicion de memoria y lo almacena en D5
+000010E4                           125      
+000010E4  B87C 0000                126      CMP #0,D4 ;B0
+000010E8  6600 0006                127      BNE AUX0
+000010EC  3A38 1002                128      MOVE EB0,D5
+000010F0                           129      
+000010F0                           130  AUX0:
+000010F0  B87C 0001                131      CMP #1,D4 ;B1
+000010F4  6600 0006                132      BNE AUX1
+000010F8  3A38 1004                133      MOVE EB1,D5
+000010FC                           134      
+000010FC                           135  AUX1:    
+000010FC  B87C 0002                136      CMP #2,D4 ;R2
+00001100  6600 0006                137      BNE AUX2
+00001104  3A38 1006                138      MOVE ER2,D5
+00001108                           139      
+00001108                           140  AUX2:    
+00001108  B87C 0003                141      CMP #3,D4 ;R3
+0000110C  6600 0006                142      BNE AUX3
+00001110  3A38 1008                143      MOVE ER3,D5
+00001114                           144  
+00001114                           145  AUX3:    
+00001114  B87C 0004                146      CMP #4,D4 ;R4
+00001118  6600 0006                147      BNE AUX4
+0000111C  3A38 100A                148      MOVE ER4,D5
+00001120                           149  
+00001120                           150  AUX4:    
+00001120  B87C 0005                151      CMP #5,D4 ;R5
+00001124  6600 0006                152      BNE AUX5
+00001128  3A38 100C                153      MOVE ER5,D5
+0000112C                           154  
+0000112C                           155  AUX5:    
+0000112C  B87C 0006                156      CMP #6,D4 ;T6
+00001130  6600 0006                157      BNE AUX6
+00001134  3A38 100E                158      MOVE ET6,D5
+00001138                           159      
+00001138                           160  AUX6:   
+00001138  B87C 0007                161      CMP #7,D4 ;T7
+0000113C  6600 0006                162      BNE AUX7
+00001140  3A38 1010                163      MOVE ET7,D5
+00001144                           164      
+00001144                           165  AUX7:
+00001144  4E75                     166      RTS
+00001146                           167      
+00001146                           168  ACT_FLAGS:
+00001146  3F06                     169      MOVE.W D6,-(SP)
+00001148                           170      
+00001148  3C38 1012                171      MOVE.W ESR,D6
+0000114C                           172      
+0000114C  BA7C 0000                173      CMP #0,D5
+00001150  6600 000A                174      BNE NO_CERO
+00001154  08C6 0002                175      BSET #2,D6
+00001158  6000 0006                176      BRA CERO_PUESTO
+0000115C                           177  NO_CERO:
+0000115C  0886 0002                178      BCLR #2,D6
+00001160                           179  CERO_PUESTO:
+00001160                           180      
+00001160  0B3C 000F                181      BTST D5,#15
+00001164  6600 000A                182      BNE ES_1
+00001168  0886 0000                183      BCLR #0,D6
+0000116C  6000 0006                184      BRA CERO_PUESTO1
+00001170                           185  ES_1:
+00001170  08C6 0000                186      BSET.L #0,D6
+00001174                           187  CERO_PUESTO1:
+00001174                           188  
+00001174  3C1F                     189      MOVE.W (SP)+,D6
+00001176  4E75                     190      RTS
+00001178                           191      
+00001178                           192  ;actualizar flag C  
+00001178                           193  ACT_FLAG_C:
+00001178  3F06                     194      MOVE.W D6,-(SP)
+0000117A  3F07                     195      MOVE.W D7,-(SP)
+0000117C                           196   
+0000117C  3C38 1012                197      MOVE.W ESR,D6
+00001180  40C7                     198      MOVE.W SR,D7
+00001182  0F3C 0000                199      BTST D7,#0
+00001186  6700 000A                200      BEQ ES_CERO
+0000118A  08C6 0001                201      BSET #1,D6
+0000118E  31C6 1012                202      MOVE.W D6,ESR
+00001192                           203       
+00001192                           204  ES_CERO:
+00001192  3E1F                     205      MOVE.W (SP)+,D7
+00001194  3C1F                     206      MOVE.W (SP)+,D6    
+00001196                           207      
+00001196  4E75                     208      RTS
+00001198                           209  
+00001198                           210  
+00001198                           211       
+00001198                           212  
+00001198                           213      END    START        
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ACT_FLAGS           1146
+ACT_FLAG_C          1178
+AUX0                10F0
+AUX0_               108E
+AUX1                10FC
+AUX1_               109A
+AUX2                1108
+AUX2_               10A6
+AUX3                1114
+AUX3_               10B2
+AUX4                1120
+AUX4_               10BE
+AUX5                112C
+AUX5_               10CA
+AUX6                1138
+AUX6_               10D6
+AUX7                1144
+AUX7_               10E2
+CERO1               106C
+CERO2               1076
+CERO3               1080
+CERO_PUESTO         1160
+CERO_PUESTO1        1174
+COJER_CONTENIDO     10E4
+DECOD_VALOR         105E
+EB0                 1002
+EB1                 1004
+EMEM                1000
+ER2                 1006
+ER3                 1008
+ER4                 100A
+ER5                 100C
+ESR                 1012
+ES_1                1170
+ES_CERO             1192
+ET6                 100E
+ET7                 1010
+GUARDAR_CONTENIDO   1082
+NO_CERO             115C
+START               1014

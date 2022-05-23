@@ -28,9 +28,6 @@ FETCH:
         ;*** En esta seccion debeis introducir el codigo necesario para cargar
         ;*** en el EIR la siguiente instruccion a ejecutar, indicada por el EPC,
 	    ;*** y dejar listo el EPC para que apunte a la siguiente instruccion
-	    
-	   MOVE.W #14,D0    ;bucle de 14 iteraciones
-	   SUBQ.W #1,D0
 	   
 	   MOVE.W EPC,A0
 	   MOVE.L A0,D2
@@ -112,26 +109,14 @@ ETRA:
     JSR GUARDAR_CONTENIDO
     
     ;actualizar flags Z y N
-    CMP #0,D5
-    BNE NO_CERO
-    BSET.B #2,ESR
-    BRA CERO_PUESTO
-NO_CERO:
-    BCLR.B #2,ESR
-CERO_PUESTO:
+    JSR ACT_FLAGS
     
-    BTST D5,#15
-    BNE ES_1
-    BCLR.B #0,ESR
-    BRA CERO_PUESTO1
-ES_1:
-    BSET.B #0,ESR
-CERO_PUESTO1:
-
     ;limpiar los registros usados
     CLR.W D3
     CLR.W D4
     CLR.W D5    
+    
+    JMP FETCH
 EADD:
     ;mover aaa a la posicion menos significativa
     MOVE.W EIR,D3
@@ -154,69 +139,106 @@ EADD:
     JSR COJER_CONTENIDO
     ;en D5 esta el contenido de bbb
     
-    ADD.W D5,D6
+    ADD.W D6,D5
     ;resultado suma en D5
+    MOVE.W SR,D7
+    ;guardar flags de la operación
     
     JSR GUARDAR_CONTENIDO
     ;D4 es bbb, guardar contenido ahi
     
-    ;actualizar flags Z,N
-    CMP #0,D5
-    BNE _NO_CERO
-    BSET.B #2,ESR
-    BRA CERO_PUESTO2
-_NO_CERO:
-    BCLR.B #2,ESR
-CERO_PUESTO2:
-    BTST.B D5,#15
-    BNE _ES_1
-    BCLR.B #0,ESR
-    BRA CERO_PUESTO3
-_ES_1:
-    BSET.B #0,ESR
-CERO_PUESTO3:
-    
+    ;actualizar flags Z,N (con lo que hay en D5)
+    JSR ACT_FLAGS
     ;actualizar flag C
+    JSR ACT_FLAG_C
     
-
+    ;limpiar registros
+    CLR.W D3
+    CLR.W D4
+    CLR.W D5
+    CLR.W D6
     
-    
-    
-    
-    
-
-    
-    
+    JMP FETCH
 ESUB:
+    JMP FETCH
 ENAN:
+    JMP FETCH
 ESTC:
     MOVE.W EIR,D3
     AND.W #$0F00,D3
     LSR.L #8,D3
-
     JSR DECOD_VALOR
     ;en D4 esta el valor de bbb en decimal
     
     ;cojer constante k
-    
+    MOVE.W EIR,D3
+    AND.W #$00FF,D3
+    EXT.W D3
+    EXT.L D3
+    MOVE.W D3,D5
     ;guardarlo en el registro indicado (D4 <--- [D5])
+    ;actualizar flags N y Z
+    JSR ACT_FLAGS
     
+    JSR GUARDAR_CONTENIDO
+    
+    CLR.W D3
+    CLR.W D4
+    CLR.W D5
+    
+    JMP FETCH
 
-EINC:
-ELOA:
-ELOAX:
-ESTO:
-ESTOX:
-EBRI:
-EBRZ:
-EBRN:
-ESTP:
-       
-    ;--- FEXEC: FIN EJECUCION
+EINC:;revisar
+    ;cojer constante k
+    MOVE.W EIR,D3
+    AND.W #$00FF,D3
+    EXT.W D3
+    EXT.L D3
+    MOVE.W D3,D6
     
-       DBRA D0,FETCH   ;bucle temporal
-       
-       SIMHALT  ;TEMPORAL
+    MOVE.W EIR,D3
+    AND.W #$0F00,D3
+    LSR.L #8,D3
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de bbb en decimal
+    
+    JSR COJER_CONTENIDO
+    ;en D5 contenido de bbb
+    
+    ADD.W D5,D6
+    
+    ;actualizar flags N,Z y C
+    MOVE.W SR,D7
+    JSR ACT_FLAGS
+    JSR ACT_FLAG_C
+    
+    JSR GUARDAR_CONTENIDO
+    ;guarda la suma en el eregistro correspondiente
+    
+    CLR.W D3
+    CLR.W D4
+    CLR.W D5
+    CLR.W D6
+ 
+    JMP FETCH
+     
+ELOA:
+    JMP FETCH
+ELOAX:
+    JMP FETCH
+ESTO:
+    JMP FETCH
+ESTOX:
+    JMP FETCH
+EBRI:
+    JMP FETCH
+EBRZ:
+    JMP FETCH
+EBRN:
+    JMP FETCH
+ESTP:
+    SIMHALT   
+    ;--- FEXEC: FIN EJECUCION
 
     ;--- ISUBR: INICIO SUBRUTINAS
         ;*** Aqui debeis incluir las subrutinas que necesite vuestra solucion
@@ -330,16 +352,46 @@ AUX6_:
     
 AUX7_:
 
+    RTS
+
+;Actualización de flags Z y N (Dato en D5)
+ACT_FLAGS:
+    MOVE.W D6,-(SP)
     
+    MOVE.W ESR,D6
+    
+    CMP #0,D5
+    BNE _CERO
+    BSET #2,D6
+    BRA UNO_PUESTO
+_CERO:
+    BCLR #2,D6
+UNO_PUESTO:
+    
+    BTST D5,#15
+    BNE ES_0
+    BSET #0,D6
+    BRA UNO_PUESTO1
+ES_0:
+    BCLR #0,D6
+UNO_PUESTO1:
+
+    MOVE.W (SP)+,D6
     RTS
     
-FLAG_C:
-    MOVE.W SR,D6
-    BTST.W D6,#0
+;actualizar flag C  
+ACT_FLAG_C:
+    MOVE.W D6,-(SP)
+    MOVE.W ESR,D6
 
+    BTST D7,#0
+    BNE ES_CERO
+    BSET #1,D6
+    MOVE.W D6,ESR
+     
+ES_CERO:
+    MOVE.W (SP)+,D6    
     
-
-
     RTS
 
         
@@ -478,6 +530,8 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
+
 
 
 
