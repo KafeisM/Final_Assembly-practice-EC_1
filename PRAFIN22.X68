@@ -174,7 +174,6 @@ ESTC:
     MOVE.W EIR,D3
     AND.W #$00FF,D3
     EXT.W D3
-    EXT.L D3
     MOVE.W D3,D5
     ;guardarlo en el registro indicado (D4 <--- [D5])
     ;actualizar flags N y Z
@@ -193,7 +192,6 @@ EINC:;revisar
     MOVE.W EIR,D3
     AND.W #$00FF,D3
     EXT.W D3
-    EXT.L D3
     MOVE.W D3,D6
     
     MOVE.W EIR,D3
@@ -530,6 +528,7 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
