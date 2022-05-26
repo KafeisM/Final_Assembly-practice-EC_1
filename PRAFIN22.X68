@@ -229,10 +229,48 @@ ESTO:
 ESTOX:
     JMP FETCH
 EBRI:
+    ;cojer valor M y meterlo en PC
+    MOVE.W EMEM,D3
+    AND.W #$0FF0,D3
+    LSR.L #4,D3
+    MOVE.W D3,EPC
+    
+    CLR.W D3
+
     JMP FETCH
 EBRZ:
+    
+    MOVE.W ESR,D3
+    BTST #2,D3
+    BEQ Z_0
+    ;si es 0 salta, sino, si Z es 1, se hace PC <---M
+    
+    ;cojer valor M y meterlo en PC
+    MOVE.W EMEM,D3
+    AND.W #$0FF0,D3
+    LSR.L #4,D3
+    MOVE.W D3,EPC
+    
+Z_0:
+    CLR.W D3
+    
     JMP FETCH
 EBRN:
+
+    MOVE.W ESR,D3
+    BTST #0,D3
+    BEQ N_0
+    ;si es 0 salta, sino, si N es 1, se hace PC <---M
+    
+    ;cojer valor M y meterlo en PC
+    MOVE.W EMEM,D3
+    AND.W #$0FF0,D3
+    LSR.L #4,D3
+    MOVE.W D3,EPC
+    
+N_0:
+    CLR.W D3
+    
     JMP FETCH
 ESTP:
     SIMHALT   
@@ -528,6 +566,7 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
