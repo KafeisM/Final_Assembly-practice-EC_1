@@ -89,7 +89,7 @@ JMPLIST:
 	; ESCRIBID EN CADA ETIQUETA LA FASE DE EJECUCION DE CADA INSTRUCCION
 	
 ETRA:
-    ;mover aaa a la posicion menos significativa
+   ;mover aaa a la posicion menos significativa
     MOVE.W EIR,D3
     AND.W #$00F0,D3
     LSR.L #4,D3
@@ -160,6 +160,48 @@ EADD:
     
     JMP FETCH
 ESUB:
+
+    ;mover aaa a la posicion menos significativa
+    MOVE.W EIR,D3
+    AND.W #$00F0,D3
+    LSR.L #4,D3
+
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de aaa en decimal
+    JSR COJER_CONTENIDO
+    ;en D5 esta el contenido de el eregistro Xa
+    MOVE.W D5,D6
+    
+    ;mirar el operando b
+    MOVE.W EIR,D3
+    AND.W #$0F00,D3
+    LSR.L #8,D3
+    
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de bbb en decimal
+    JSR COJER_CONTENIDO
+    ;en D5 esta el contenido de bbb
+    
+    SUB.W D6,D5
+    ;resultado suma en D6
+    MOVE.W SR,D7
+    ;guardar flags de la operación
+    
+    JSR GUARDAR_CONTENIDO
+    ;D4 es bbb, guardar contenido ahi
+    
+    ;actualizar flags Z,N (con lo que hay en D5)
+    JSR ACT_FLAGS
+    ;actualizar flag C
+    JSR ACT_FLAG_C
+    
+    ;limpiar registros
+    CLR.W D3
+    CLR.W D4
+    CLR.W D5
+    CLR.W D6
+
+    
     JMP FETCH
 ENAN:
     JMP FETCH
@@ -566,6 +608,7 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
