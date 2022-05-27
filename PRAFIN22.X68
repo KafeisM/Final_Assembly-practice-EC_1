@@ -142,7 +142,7 @@ EADD:
     ADD.W D6,D5
     ;resultado suma en D5
     MOVE.W SR,D7
-    ;guardar flags de la operación
+    ;guardar flags de la operaciï¿½n
     
     JSR GUARDAR_CONTENIDO
     ;D4 es bbb, guardar contenido ahi
@@ -185,7 +185,7 @@ ESUB:
     SUB.W D6,D5
     ;resultado suma en D6
     MOVE.W SR,D7
-    ;guardar flags de la operación
+    ;guardar flags de la operaciï¿½n
     
     JSR GUARDAR_CONTENIDO
     ;D4 es bbb, guardar contenido ahi
@@ -263,12 +263,111 @@ EINC:;revisar
     JMP FETCH
      
 ELOA:
+        ;cojer la M mediante una mascara y guardarla en D3
+    MOVE.W EIR,D3
+    AND.W #$0FF0,D3
+    LSR.L #4,D3
+    MULU #2,D3
+    MOVE.W D3,A2
+    
+    MOVE.W EMEM(A2),ET6 ;mover el contenido de 1000 + M 
+    
+    ;limpiar los registros usados
+    CLR.W D3
+    CLR.W A2
     JMP FETCH
 ELOAX:
-    JMP FETCH
+    ;cojer la M mediante una mascara y guardarla en D3
+    MOVE.W EIR,D3
+    AND.W #$0FF0,D3
+    LSR.L #4,D3
+       
+    ;mirar con el bit i que registro B tomar
+    MOVE.W EIR,D4
+    BTST #3, D4
+    BEQ I_0 ;salta si es 0
+    MOVE.W EB1,D5
+    ADD.W D5,D3
+    MULU #2,D3
+    MOVE.W D3,A2
+    JMP B_COMPROBADO
+    
+I_0:
+    MOVE.W EB0,D5
+    ADD.W D5,D3
+    MULU #2,D3
+    MOVE.W D3,A2
+
+B_COMPROBADO:
+    
+    ;mirar con el bit j que registro T tomar
+    
+    BTST #2,D4
+    BEQ J_0 ;salta si j es 0
+    MOVE.W EMEM(A2),ET7
+    JMP J_COMPROBADO
+J_0:
+    MOVE.W EMEM(A2),ET6
+J_COMPROBADO:
+
+    ;limpiar los registros usados
+    CLR.W D3
+    CLR.W D4
+    CLR.W D5
+    CLR.W A2  
+       
+    JMP FETCH    
+   
 ESTO:
+    MOVE.W ET6,D4 ;cojemos el contenido de T6 y lo guardamos en D4
+    
+    MOVE.W EIR,D3 ;cojer la M mediante una mascara y guardarla en D3
+    AND.W #$0FF0,D3
+    LSR.L #4,D3
+    MULU #2,D3
+    MOVE.W D3,A2
+    
+    MOVE D4,EMEM(A2)
+
+    ;limpiar los registros usados
+    CLR.W D3
+    CLR.W D4
+    CLR.W A2
+
     JMP FETCH
+
 ESTOX:
+    MOVE.W EIR,D4
+    BTST #2,D4
+    BEQ J_0_
+    MOVE ET7,D6 
+    JMP J_COMPROBADO_  
+J_0_:
+    MOVE ET6,D6
+
+J_COMPROBADO_:    
+    MOVE.W EIR,D3 ;cojer la M mediante una mascara y guardarla en D3
+    AND.W #$0FF0,D3
+    LSR.L #4,D3
+    
+    ;mirar con el bit i que registro B tomar
+
+    BTST #3, D4
+    BEQ I_0_ ;salta si es 0
+    MOVE.W EB1,D5
+    ADD.W D5,D3
+    MULU #2,D3
+    MOVE.W D3,A2
+    JMP B_COMPROBADO_    
+I_0_:
+    MOVE.W EB0,D5
+    ADD.W D5,D3
+    MULU #2,D3
+    MOVE.W D3,A2 
+
+B_COMPROBADO_: 
+    MOVE.W D6,EMEM(A2)
+    
     JMP FETCH
 EBRI:
     ;cojer valor M y meterlo en PC
@@ -432,7 +531,7 @@ AUX7_:
 
     RTS
 
-;Actualización de flags Z y N (Dato en D5)
+;Actualizaciï¿½n de flags Z y N (Dato en D5)
 ACT_FLAGS:
     MOVE.W D6,-(SP)
     
@@ -547,7 +646,7 @@ R0BIT14_1:
        BTST.L #12,D2
        BNE R0_1_BIT12_1
        
-       MOVE.W #6,10(SP)  ;instrucciónn num LOA M
+       MOVE.W #6,10(SP)  ;instrucciï¿½nn num LOA M
        JMP END_DEC
        
 R0BIT13_1:
@@ -579,12 +678,12 @@ BIT15_1:
        BTST.L #12,D2
        BNE R1BIT12_1
        
-       MOVE.W #10,10(SP) ;instrucción  num BRI M
+       MOVE.W #10,10(SP) ;instrucciï¿½n  num BRI M
        JMP END_DEC
        
     
 R1BIT14_1:
-       MOVE.W #13,10(SP) ;instrucción num STP
+       MOVE.W #13,10(SP) ;instrucciï¿½n num STP
        JMP END_DEC
                                      
 R1BIT13_1:
