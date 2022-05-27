@@ -646,7 +646,7 @@ R0BIT14_1:
        BTST.L #12,D2
        BNE R0_1_BIT12_1
        
-       MOVE.W #6,10(SP)  ;instrucci�nn num LOA M
+       MOVE.W #6,10(SP)  ;instruccion num LOA M
        JMP END_DEC
        
 R0BIT13_1:
@@ -678,16 +678,16 @@ BIT15_1:
        BTST.L #12,D2
        BNE R1BIT12_1
        
-       MOVE.W #10,10(SP) ;instrucci�n  num BRI M
+       MOVE.W #10,10(SP) ;instruccion  num BRI M
        JMP END_DEC
        
     
 R1BIT14_1:
-       MOVE.W #13,10(SP) ;instrucci�n num STP
+       MOVE.W #13,10(SP) ;instrucciion num STP
        JMP END_DEC
                                      
 R1BIT13_1:
-       MOVE.W #12,10(SP) ;instruccin num BRN M
+       MOVE.W #12,10(SP) ;instruccion num BRN M
        JMP END_DEC
 
 R1BIT12_1:
@@ -707,6 +707,7 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
