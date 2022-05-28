@@ -142,7 +142,7 @@ EADD:
     ADD.W D6,D5
     ;resultado suma en D5
     MOVE.W SR,D7
-    ;guardar flags de la operaciï¿½n
+    ;guardar flags de la operacion
     
     JSR GUARDAR_CONTENIDO
     ;D4 es bbb, guardar contenido ahi
@@ -181,8 +181,14 @@ ESUB:
     ;en D4 esta el valor de bbb en decimal
     JSR COJER_CONTENIDO
     ;en D5 esta el contenido de bbb
+    NOT.W D5
+    ADD.W #1,D5
     
-    SUB.W D6,D5
+    MOVE.W SR,D7
+    ;guardar flags de la operacion
+    
+    ;operacion A - B = A + (B¯ + 1)
+    ADD.W D6,D5
     ;resultado suma en D6
     MOVE.W SR,D7
     ;guardar flags de la operaciï¿½n
@@ -246,6 +252,9 @@ EINC:
     ;en D5 contenido de bbb
     
     ADD.W D6,D5
+    
+    MOVE.W SR,D7
+    ;guardar flags de la operacion
     
     ;actualizar flags N,Z y C
     JSR ACT_FLAGS
@@ -419,7 +428,7 @@ N_0:
     
     JMP FETCH
 ESTP:
-    SIMHALT   
+    JMP SIMHALT   
     ;--- FEXEC: FIN EJECUCION
 
     ;--- ISUBR: INICIO SUBRUTINAS
@@ -557,7 +566,8 @@ UNO_PUESTO:
 ES_0:
     BCLR #0,D6
 UNO_PUESTO1:
-
+   
+    MOVE.W D6,ESR
     MOVE.W (SP)+,D6
     RTS
     
@@ -567,11 +577,16 @@ ACT_FLAG_C:
     MOVE.W ESR,D6
 
     BTST D7,#0
-    BNE ES_CERO
+    BEQ ES_CERO
     BSET #1,D6
-    MOVE.W D6,ESR
+    JMP _1_COL
+    
      
 ES_CERO:
+    BCLR #1,D6
+_1_COL:
+    
+    MOVE.W D6,ESR
     MOVE.W (SP)+,D6    
     
     RTS
@@ -711,6 +726,9 @@ END_DEC:
       RTS
       
     ;--- FDECOD: FIN DECOD
+SIMHALT:
+    SIMHALT
+    
     END    START
 
 
