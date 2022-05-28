@@ -229,7 +229,7 @@ ESTC:
     
     JMP FETCH
 
-EINC:;revisar
+EINC:
     ;cojer constante k
     MOVE.W EIR,D3
     AND.W #$00FF,D3
@@ -245,10 +245,9 @@ EINC:;revisar
     JSR COJER_CONTENIDO
     ;en D5 contenido de bbb
     
-    ADD.W D5,D6
+    ADD.W D6,D5
     
     ;actualizar flags N,Z y C
-    MOVE.W SR,D7
     JSR ACT_FLAGS
     JSR ACT_FLAG_C
     
@@ -270,11 +269,15 @@ ELOA:
     MULU #2,D3
     MOVE.W D3,A2
     
-    MOVE.W EMEM(A2),ET6 ;mover el contenido de 1000 + M 
+    MOVE.W EMEM(A2),ET6 ;mover el contenido de 1000 + M
+    
+    ;actualizar flags Z y N
+    MOVE.W EMEM(A2),D5
+    JSR ACT_FLAGS
     
     ;limpiar los registros usados
     CLR.W D3
-    CLR.W A2
+    CLR.W D5
     JMP FETCH
 ELOAX:
     ;cojer la M mediante una mascara y guardarla en D3
@@ -310,11 +313,14 @@ J_0:
     MOVE.W EMEM(A2),ET6
 J_COMPROBADO:
 
+    ;actualizar flags Z y N
+    MOVE.W EMEM(A2),D5
+    JSR ACT_FLAGS
+
     ;limpiar los registros usados
     CLR.W D3
     CLR.W D4
     CLR.W D5
-    CLR.W A2  
        
     JMP FETCH    
    
@@ -332,7 +338,6 @@ ESTO:
     ;limpiar los registros usados
     CLR.W D3
     CLR.W D4
-    CLR.W A2
 
     JMP FETCH
 
@@ -371,7 +376,7 @@ B_COMPROBADO_:
     JMP FETCH
 EBRI:
     ;cojer valor M y meterlo en PC
-    MOVE.W EMEM,D3
+    MOVE.W EIR,D3
     AND.W #$0FF0,D3
     LSR.L #4,D3
     MOVE.W D3,EPC
@@ -387,7 +392,7 @@ EBRZ:
     ;si es 0 salta, sino, si Z es 1, se hace PC <---M
     
     ;cojer valor M y meterlo en PC
-    MOVE.W EMEM,D3
+    MOVE.W EIR,D3
     AND.W #$0FF0,D3
     LSR.L #4,D3
     MOVE.W D3,EPC
@@ -404,7 +409,7 @@ EBRN:
     ;si es 0 salta, sino, si N es 1, se hace PC <---M
     
     ;cojer valor M y meterlo en PC
-    MOVE.W EMEM,D3
+    MOVE.W EIR,D3
     AND.W #$0FF0,D3
     LSR.L #4,D3
     MOVE.W D3,EPC
@@ -531,7 +536,7 @@ AUX7_:
 
     RTS
 
-;Actualizaci�n de flags Z y N (Dato en D5)
+;Actualizacion de flags Z y N (Dato en D5)
 ACT_FLAGS:
     MOVE.W D6,-(SP)
     
@@ -707,6 +712,7 @@ END_DEC:
       
     ;--- FDECOD: FIN DECOD
     END    START
+
 
 
 
