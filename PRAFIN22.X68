@@ -239,6 +239,15 @@ ENAN:
     
     JSR GUARDAR_CONTENIDO
     ;D4 es bbb, guardar contenido ahi
+
+    ;actualizar flags Z,N (con lo que hay en D5)
+    JSR ACT_FLAGS
+
+    CLR.W D3
+    CLR.W D4
+    CLR.W D5
+    CLR.W D6
+
     JMP FETCH
 ESTC:
     MOVE.W EIR,D3
