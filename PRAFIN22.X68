@@ -187,7 +187,7 @@ ESUB:
     MOVE.W SR,D7
     ;guardar flags de la operacion
     
-    ;operacion A - B = A + (B¯ + 1)
+    ;operacion A - B = A + (Bï¿½ + 1)
     ADD.W D6,D5
     ;resultado suma en D6
     MOVE.W SR,D7
@@ -210,6 +210,35 @@ ESUB:
     
     JMP FETCH
 ENAN:
+    ;mover aaa a la posicion menos significativa
+    MOVE.W EIR,D3
+    AND.W #$00F0,D3
+    LSR.L #4,D3
+
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de aaa en decimal
+    JSR COJER_CONTENIDO
+    ;en D5 esta el contenido de el eregistro Xa
+    MOVE.W D5,D6
+    
+    ;mirar el operando b
+    MOVE.W EIR,D3
+    AND.W #$0F00,D3
+    LSR.L #8,D3
+    
+    JSR DECOD_VALOR
+    ;en D4 esta el valor de bbb en decimal
+    JSR COJER_CONTENIDO
+    ;en D5 esta el contenido de bbb   
+
+    AND.W D6,D5
+    ;resultado ADD en D5
+    NOT.W D5
+    MOVE.W SR,D7
+    ;guardar flags de la operacion
+    
+    JSR GUARDAR_CONTENIDO
+    ;D4 es bbb, guardar contenido ahi
     JMP FETCH
 ESTC:
     MOVE.W EIR,D3
