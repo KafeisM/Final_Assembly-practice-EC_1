@@ -5,7 +5,8 @@
 * Description: Emulador de la JARVIS
 *-----------------------------------------------------------
     ORG $1000
-EMEM:   DC.W $40A0,$00E0,$40B0,$0960,$2100,$A070,$C000,$0E10,$60C0,$C000,$0006,$0004,$0000
+EMEM:   DC.W $2800,$2A03,$50E0,$0B60,$5114,$0C70,$1430,$0E40,$7140,$3001,$32FF,$90D0
+        DC.W $8020,$C000,$0002,$0003,$0001,$0003,$0002,$0004,$0000,$0000,$0000
 EIR:    DC.W 0 ;eregistro de instruccion
 EPC:    DC.W 0 ;econtador de programa
 EB0:    DC.W 0 ;eregistro B0
@@ -767,6 +768,7 @@ SIMHALT:
     SIMHALT
     
     END    START
+
 
 
 
